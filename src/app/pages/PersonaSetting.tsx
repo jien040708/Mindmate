@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart } from "lucide-react";
+import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart, ArrowLeft } from "lucide-react";
 import { Persona } from "../types/persona";
 
 const getIcon = (iconName: string) => {
@@ -92,7 +92,13 @@ export default function PersonaSetting() {
 
   const getMBTI = () => {
     return mbtiDimensions
-      .map((dim, i) => (values[i] < 50 ? dim.left : dim.right))
+      .map((dim, i) => {
+        // More granular selection: under 45 = left, over 55 = right, 45-55 = slightly favoring the side
+        if (values[i] < 45) return dim.left;
+        if (values[i] > 55) return dim.right;
+        // For middle range, use exact 50 as threshold
+        return values[i] < 50 ? dim.left : dim.right;
+      })
       .join("");
   };
 
@@ -119,18 +125,40 @@ export default function PersonaSetting() {
   };
 
   const handleCreate = () => {
+    if (!name.trim()) {
+      alert("Please enter a name for your counselor.");
+      return;
+    }
+
+    const trimmedName = name.trim();
+    const normalizedName = trimmedName.toLowerCase();
+
+    // Check against default persona names
+    const defaultPersonaNames = ["listener", "friend", "consultant", "coach"];
+    if (defaultPersonaNames.includes(normalizedName)) {
+      alert(`"${trimmedName}" is a reserved name. Please choose a different name.`);
+      return;
+    }
+
+    // Check for duplicate names in saved personas
+    const savedPersonas = localStorage.getItem("personas");
+    const personas = savedPersonas ? JSON.parse(savedPersonas) : [];
+
+    if (personas.some((p: Persona) => p.name.toLowerCase() === normalizedName)) {
+      alert(`A counselor with the name "${trimmedName}" already exists. Please choose a different name.`);
+      return;
+    }
+
     const mbti = getMBTI();
     const newPersona: Persona = {
       id: Date.now().toString(),
-      name: name || `${mbti} Counselor`,
+      name: trimmedName,
       mbti,
       description: getMBTIDescription(mbti),
       color: selectedColor,
       icon: selectedIcon,
     };
 
-    const savedPersonas = localStorage.getItem("personas");
-    const personas = savedPersonas ? JSON.parse(savedPersonas) : [];
     personas.push(newPersona);
     localStorage.setItem("personas", JSON.stringify(personas));
 
@@ -140,6 +168,16 @@ export default function PersonaSetting() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] p-6 py-12">
       <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            <ArrowLeft className="w-5 h-5 text-[#355F4B]" />
+            <span className="font-semibold text-[#355F4B]">Back to Home</span>
+          </button>
+        </div>
+
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] rounded-full mb-4">
             <User className="w-8 h-8 text-white" />
@@ -148,22 +186,26 @@ export default function PersonaSetting() {
             Create Counselor Persona
           </h1>
           <p className="text-gray-600">
-            Adjust sliders to set your counselor's personality
+            Select your counselor's MBTI personality traits
           </p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-2xl p-8 space-y-10">
           <div className="space-y-4">
             <h3 className="font-semibold text-lg text-gray-800">
-              Counselor Name (Optional)
+              Counselor Name <span className="text-red-500">*</span>
             </h3>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={`${getMBTI()} Counselor`}
+              placeholder="Enter a unique name for your counselor"
+              required
               className="w-full px-5 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#6BCB9A] focus:border-transparent"
             />
+            <p className="text-xs text-gray-500">
+              * Required field - Must be unique
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -216,30 +258,44 @@ export default function PersonaSetting() {
               <h3 className="font-semibold text-lg text-gray-800">
                 {dimension.name}
               </h3>
-              <div className="flex items-center gap-6">
-                <div className="flex-1 text-left">
-                  <div className="font-semibold text-[#6BCB9A]">
-                    {dimension.leftLabel} ({dimension.left})
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleSliderChange(index, 25)}
+                  className={`flex-1 p-4 rounded-xl border-2 transition-all ${
+                    values[index] < 50
+                      ? "border-[#6BCB9A] bg-[#CFF3E4]/30 scale-105"
+                      : "border-gray-200 hover:border-[#6BCB9A]/50"
+                  }`}
+                >
+                  <div className="font-semibold text-[#6BCB9A] text-sm mb-1">
+                    {dimension.leftLabel}
                   </div>
-                  <p className="text-sm text-gray-500">{dimension.leftDesc}</p>
-                </div>
-                <div className="flex-1 text-right">
-                  <div className="font-semibold text-[#355F4B]">
-                    {dimension.rightLabel} ({dimension.right})
+                  <div className="text-3xl font-bold text-[#355F4B] mb-2">
+                    {dimension.left}
                   </div>
-                  <p className="text-sm text-gray-500">{dimension.rightDesc}</p>
-                </div>
+                  <p className="text-xs text-gray-500 leading-tight">
+                    {dimension.leftDesc}
+                  </p>
+                </button>
+                <button
+                  onClick={() => handleSliderChange(index, 75)}
+                  className={`flex-1 p-4 rounded-xl border-2 transition-all ${
+                    values[index] >= 50
+                      ? "border-[#355F4B] bg-[#CFF3E4]/30 scale-105"
+                      : "border-gray-200 hover:border-[#355F4B]/50"
+                  }`}
+                >
+                  <div className="font-semibold text-[#355F4B] text-sm mb-1">
+                    {dimension.rightLabel}
+                  </div>
+                  <div className="text-3xl font-bold text-[#6BCB9A] mb-2">
+                    {dimension.right}
+                  </div>
+                  <p className="text-xs text-gray-500 leading-tight">
+                    {dimension.rightDesc}
+                  </p>
+                </button>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={values[index]}
-                onChange={(e) =>
-                  handleSliderChange(index, parseInt(e.target.value))
-                }
-                className="w-full h-3 bg-gradient-to-r from-[#CFF3E4] to-[#6BCB9A]/40 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-[#6BCB9A] [&::-webkit-slider-thumb]:to-[#355F4B] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
-              />
             </div>
           ))}
 

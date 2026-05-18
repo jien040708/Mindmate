@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router";
-import { Heart, MessageCircle, Plus, User, Sparkles, Zap, Ear, Users, Briefcase, Target, Archive, Database } from "lucide-react";
+import { Heart, MessageCircle, Plus, User, Sparkles, Zap, Ear, Users, Briefcase, Target, Archive, Database, LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Persona } from "../types/persona";
+import { useAuth } from "../contexts/AuthContext";
 
 const defaultAI: Persona = {
   id: "default",
@@ -26,7 +27,7 @@ const defaultPersonas: Persona[] = [
     name: "Friend",
     mbti: "ENFP",
     description: "A friendly companion who chats comfortably and shares positive energy",
-    color: "#EEDC82",
+    color: "#6BCB9A",
     icon: "users",
   },
   {
@@ -34,7 +35,7 @@ const defaultPersonas: Persona[] = [
     name: "Consultant",
     mbti: "INTJ",
     description: "An analytical counselor providing professional and logical advice",
-    color: "#355F4B",
+    color: "#6BCB9A",
     icon: "briefcase",
   },
   {
@@ -66,9 +67,13 @@ const getIcon = (iconName?: string) => {
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [customPersonas, setCustomPersonas] = useState<Persona[]>([]);
   const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
   const [mood, setMood] = useState<number>(50);
+  const [language, setLanguage] = useState<string>("Korean");
+  const [hasConsented, setHasConsented] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     const savedPersonas = localStorage.getItem("personas");
@@ -84,41 +89,88 @@ export default function Home() {
   };
 
   const getMoodLabel = (value: number) => {
+    if (value < 10) return "Terrible";
     if (value < 20) return "Very Bad";
-    if (value < 40) return "Bad";
+    if (value < 30) return "Bad";
+    if (value < 40) return "Not Good";
+    if (value < 50) return "Struggling";
     if (value < 60) return "Okay";
+    if (value < 70) return "Fine";
     if (value < 80) return "Good";
-    return "Very Good";
+    if (value < 90) return "Very Good";
+    return "Excellent";
   };
 
   const getMoodEmoji = (value: number) => {
+    if (value < 10) return "😭";
     if (value < 20) return "😢";
+    if (value < 30) return "😞";
     if (value < 40) return "😟";
+    if (value < 50) return "😕";
     if (value < 60) return "😐";
-    if (value < 80) return "🙂";
-    return "😄";
+    if (value < 70) return "🙂";
+    if (value < 80) return "😊";
+    if (value < 90) return "😄";
+    return "🤗";
   };
 
   const handleStartChat = () => {
-    const personaToUse = selectedPersona || defaultAI;
-    navigate("/chat", { state: { persona: personaToUse, mood } });
+    if (!selectedPersona) {
+      setShowWarning(true);
+      setTimeout(() => setShowWarning(false), 3000);
+      return;
+    }
+    if (!hasConsented) {
+      alert("Please acknowledge the AI limitations before starting the conversation.");
+      return;
+    }
+    navigate("/chat", { state: { persona: selectedPersona, mood, language } });
   };
 
   const handleCreateNew = () => {
     navigate("/persona");
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const handleSettings = () => {
+    navigate("/settings");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] p-6 py-12">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => navigate("/history")}
-            className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            <Database className="w-5 h-5 text-[#355F4B]" />
-            <span className="font-semibold text-[#355F4B]">Storage</span>
-          </button>
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-sm text-gray-600">
+            {user?.name && <span>Welcome, {user.name}!</span>}
+            {!user?.name && user?.email && <span>Welcome, {user.email}!</span>}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/history")}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <Database className="w-5 h-5 text-[#355F4B]" />
+              <span className="font-semibold text-[#355F4B]">Storage</span>
+            </button>
+            <button
+              onClick={handleSettings}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <SettingsIcon className="w-5 h-5 text-[#355F4B]" />
+              <span className="font-semibold text-[#355F4B]">Settings</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <LogOut className="w-5 h-5 text-[#355F4B]" />
+              <span className="font-semibold text-[#355F4B]">Logout</span>
+            </button>
+          </div>
         </div>
 
         <div className="text-center mb-12">
@@ -191,43 +243,111 @@ export default function Home() {
 
           <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-[#CFF3E4]">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-              How are you feeling today? (Optional)
+              Preferred Language
             </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>Bad</span>
-                <div className="text-center">
-                  <div className="text-3xl mb-1">{getMoodEmoji(mood)}</div>
-                  <div className="font-semibold text-gray-700">
-                    {getMoodLabel(mood)}
-                  </div>
-                </div>
-                <span>Good</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={mood}
-                onChange={(e) => setMood(parseInt(e.target.value))}
-                className="w-full h-3 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-[#6BCB9A] [&::-webkit-slider-thumb]:to-[#355F4B] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
-              />
+            <div className="flex gap-3 justify-center flex-wrap">
+              {[
+                { value: "Korean", label: "한국어", flag: "🇰🇷" },
+                { value: "English", label: "English", flag: "🇺🇸" },
+                { value: "Japanese", label: "日本語", flag: "🇯🇵" },
+                { value: "Chinese", label: "中文", flag: "🇨🇳" },
+              ].map((lang) => (
+                <button
+                  key={lang.value}
+                  onClick={() => setLanguage(lang.value)}
+                  className={`px-6 py-3 rounded-2xl border-2 transition-all flex items-center gap-2 ${
+                    language === lang.value
+                      ? "border-[#6BCB9A] bg-[#CFF3E4]/30 scale-105"
+                      : "border-gray-200 hover:border-[#6BCB9A]/50"
+                  }`}
+                >
+                  <span className="text-2xl">{lang.flag}</span>
+                  <span className="font-semibold text-gray-700">{lang.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-[#CFF3E4]">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+              How are you feeling today? (Optional)
+            </h3>
+            <div className="overflow-x-auto pb-2">
+              <div className="flex gap-3 min-w-max px-2">
+                {[
+                  { value: 10, emoji: "😭", label: "Terrible" },
+                  { value: 25, emoji: "😢", label: "Very Bad" },
+                  { value: 40, emoji: "😟", label: "Not Good" },
+                  { value: 50, emoji: "😐", label: "Okay" },
+                  { value: 60, emoji: "🙂", label: "Fine" },
+                  { value: 75, emoji: "😊", label: "Good" },
+                  { value: 85, emoji: "😄", label: "Very Good" },
+                  { value: 95, emoji: "🤗", label: "Excellent" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setMood(option.value)}
+                    className={`p-4 rounded-2xl border-2 transition-all text-center flex-shrink-0 ${
+                      mood >= option.value - 7 && mood <= option.value + 7
+                        ? "border-[#6BCB9A] bg-[#CFF3E4]/30 scale-105"
+                        : "border-gray-200 hover:border-[#6BCB9A]/50"
+                    }`}
+                  >
+                    <div className="text-3xl mb-2">{option.emoji}</div>
+                    <div className="text-xs font-semibold text-gray-700">
+                      {option.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-2xl p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasConsented}
+                  onChange={(e) => setHasConsented(e.target.checked)}
+                  className="mt-1 w-5 h-5 text-[#6BCB9A] border-gray-300 rounded focus:ring-[#6BCB9A]"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-gray-800 mb-1">
+                    I acknowledge the following:
+                  </p>
+                  <p className="text-xs text-gray-700 leading-relaxed">
+                    This AI service may occasionally provide responses that are inaccurate,
+                    inappropriate, or unhelpful. This is not a substitute for professional
+                    mental health care. If experiencing a crisis, please contact a licensed
+                    professional immediately.
+                  </p>
+                </div>
+              </label>
+            </div>
+
             <button
               onClick={handleStartChat}
-              className="w-full bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+              disabled={!hasConsented || !selectedPersona}
+              className={`w-full px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+                hasConsented && selectedPersona
+                  ? "bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white hover:shadow-xl hover:scale-105"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
             >
               <MessageCircle className="w-6 h-6" />
               {selectedPersona
                 ? `Start Conversation with ${selectedPersona.name}`
                 : "Start Conversation"}
             </button>
-            {!selectedPersona && (
-              <p className="text-center text-sm text-gray-500 mt-3">
-                No counselor selected? You'll chat with our general AI counselor
+            {showWarning && (
+              <p className="text-center text-sm text-red-500 animate-pulse">
+                Please select a counselor to start
+              </p>
+            )}
+            {selectedPersona && !hasConsented && (
+              <p className="text-center text-sm text-yellow-600">
+                Please acknowledge the terms above
               </p>
             )}
           </div>

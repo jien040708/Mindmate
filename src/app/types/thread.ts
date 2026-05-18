@@ -12,6 +12,7 @@ export interface Thread {
   persona: Persona;
   messages: Message[];
   mood?: number;
+  language?: string;
   createdAt: Date;
   title: string;
   savedWithPersona?: boolean;

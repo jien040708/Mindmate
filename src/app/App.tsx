@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { RouterProvider } from 'react-router';
-import { router } from './routes';
+import { router } from './routes.tsx';
 import Splash from './components/Splash';
+import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from './components/ui/sonner';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -18,5 +20,10 @@ export default function App() {
     return <Splash />;
   }
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+      <Toaster />
+    </AuthProvider>
+  );
 }

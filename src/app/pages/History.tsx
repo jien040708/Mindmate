@@ -54,12 +54,13 @@ export default function History() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] p-6 py-12">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="mb-8">
           <button
             onClick={() => navigate("/")}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 mb-6"
           >
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-[#355F4B]" />
+            <span className="font-semibold text-[#355F4B]">Back to Home</span>
           </button>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-[#355F4B] to-[#6BCB9A] bg-clip-text text-transparent">
             Conversation History
