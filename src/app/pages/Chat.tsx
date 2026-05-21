@@ -116,18 +116,32 @@ export default function Chat() {
     localStorage.getItem("mindmate_language") ||
     "Korean";
 
-  const getMoodContext = (moodValue?: number) => {
+  const getMoodContext = (moodValue?: number, lang?: string) => {
     if (moodValue === undefined) return "";
-    if (moodValue < 20) return " 오늘 많이 힘드신 것 같아요. 위기 상황이라면 전문 상담사에게 연락하세요.";
-    if (moodValue < 40) return " 오늘 좀 힘드셨군요. 편하게 이야기해 주세요.";
-    if (moodValue < 60) return " 오늘 어떠세요? 무슨 이야기든 해 주세요.";
-    if (moodValue < 80) return " 오늘 기분이 좋으시군요! 무슨 이야기가 있으신가요?";
-    return " 오늘 정말 좋으신 것 같아요! 무엇을 도와드릴까요?";
+    const isKo = !lang || lang === "Korean";
+    if (moodValue < 20) return isKo ? " 오늘 많이 힘드신 것 같아요. 편하게 이야기해 주세요." : " I can see you're having a tough day. Feel free to share.";
+    if (moodValue < 40) return isKo ? " 오늘 좀 힘드셨군요. 편하게 이야기해 주세요." : " Sounds like things are a bit rough. I'm here to listen.";
+    if (moodValue < 60) return isKo ? " 오늘 어떠세요? 무슨 이야기든 해 주세요." : " How are you doing? Feel free to share anything.";
+    if (moodValue < 80) return isKo ? " 오늘 기분이 좋으시군요!" : " Glad you're feeling good!";
+    return isKo ? " 오늘 정말 좋으신 것 같아요!" : " You seem to be in great spirits today!";
   };
 
   const getInitialMessage = () => {
-    if (!persona) return "MindMate에 오신 것을 환영합니다";
-    return `안녕하세요! 저는 ${persona.name}이에요. ${persona.description}${getMoodContext(mood)} 편하게 이야기해 주세요.`;
+    if (!persona) return language === "Korean" ? "MindMate에 오신 것을 환영합니다" : "Welcome to MindMate";
+    const isKo = !language || language === "Korean";
+    if (isKo) {
+      return `안녕하세요! 저는 ${persona.name}이에요. ${persona.description}${getMoodContext(mood, language)} 편하게 이야기해 주세요.`;
+    }
+    if (language === "English") {
+      return `Hello! I'm ${persona.name}. ${getMoodContext(mood, language)} Feel free to share what's on your mind.`;
+    }
+    if (language === "Japanese") {
+      return `こんにちは！私は${persona.name}です。${getMoodContext(mood, language)} 何でも気軽に話しかけてください。`;
+    }
+    if (language === "Chinese") {
+      return `你好！我是${persona.name}。${getMoodContext(mood, language)} 请随时告诉我您的想法。`;
+    }
+    return `Hello! I'm ${persona.name}. Feel free to share anything.`;
   };
 
   const [messages, setMessages] = useState<Message[]>(

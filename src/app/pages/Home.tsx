@@ -149,7 +149,7 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
 
         {/* ── 왼쪽 패널: 페르소나 목록 ── */}
-        <div className="w-72 xl:w-80 flex-shrink-0 flex flex-col bg-white/50 backdrop-blur-sm border-r border-[#CFF3E4]">
+        <div className="w-1/2 flex-shrink-0 flex flex-col bg-white/50 backdrop-blur-sm border-r border-[#CFF3E4]">
           <div className="px-4 py-3 border-b border-[#CFF3E4]">
             <h2 className="font-bold text-gray-700 text-sm uppercase tracking-wider">상담가 목록</h2>
           </div>
