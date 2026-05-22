@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import {
-  Heart, MessageCircle, Plus, User, Ear, Users, Briefcase, Target,
+  Heart, MessageCircle, Plus, User,
   Database, LogOut, Settings as SettingsIcon, Globe, Trash2, X, Edit2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -8,17 +8,7 @@ import { Persona, CnipScores } from "../types/persona";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { T } from "../i18n/translations";
-
-const getIcon = (iconName?: string) => {
-  switch (iconName) {
-    case "ear":       return Ear;
-    case "users":     return Users;
-    case "briefcase": return Briefcase;
-    case "target":    return Target;
-    case "heart":     return Heart;
-    default:          return User;
-  }
-};
+import { PersonaAvatar } from "../components/PersonaAvatar";
 
 const LANGUAGES = [
   { value: "Korean",   label: "한국어", flag: "🇰🇷" },
@@ -187,7 +177,6 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-3 gap-2">
                 {personas.map((persona) => {
-                  const IconComp = getIcon(persona.icon);
                   const isSelected = selected?.id === persona.id;
                   return (
                     <button
@@ -199,12 +188,12 @@ export default function Home() {
                           : "bg-white/60 border-transparent hover:border-[#6BCB9A]/40 hover:bg-white/80"
                       }`}
                     >
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center shadow-sm"
-                        style={{ backgroundColor: persona.color }}
-                      >
-                        <IconComp className="w-6 h-6 text-white" />
-                      </div>
+                      <PersonaAvatar
+                        persona={persona}
+                        size={48}
+                        className="shadow-sm"
+                        ringClass={isSelected ? "ring-2 ring-[#6BCB9A]/60" : ""}
+                      />
                       <p className="font-semibold text-xs text-gray-700 text-center leading-tight truncate w-full px-1">
                         {persona.name}
                       </p>
@@ -256,12 +245,11 @@ export default function Home() {
 
               {/* 아바타 (중앙) */}
               <div className="flex justify-center py-2">
-                <div
-                  className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl ring-4 ring-white"
-                  style={{ backgroundColor: selected.color }}
-                >
-                  {(() => { const I = getIcon(selected.icon); return <I className="w-12 h-12 text-white" />; })()}
-                </div>
+                <PersonaAvatar
+                  persona={selected}
+                  size={96}
+                  ringClass="ring-4 ring-white shadow-2xl"
+                />
               </div>
 
               {/* C-NIP 성향 카드 (2×2 그리드) */}

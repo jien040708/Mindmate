@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart, ArrowLeft } from "lucide-react";
+import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart, ArrowLeft, Camera } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { useLanguage } from "../contexts/LanguageContext";
+import { PersonaAvatar, CHARACTER_OPTIONS } from "../components/PersonaAvatar";
 
 const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
 
@@ -115,7 +116,21 @@ export default function PersonaSetting() {
   );
   const [name, setName]                   = useState(editPersona?.name ?? "");
   const [selectedColor, setSelectedColor] = useState(editPersona?.color ?? colorOptions[0]);
-  const [selectedIcon, setSelectedIcon]   = useState(editPersona?.icon ?? iconOptions[0].name);
+  const [selectedIcon, setSelectedIcon]   = useState(editPersona?.icon ?? "char1");
+  const [avatarDataUrl, setAvatarDataUrl] = useState<string | undefined>(editPersona?.avatarDataUrl);
+  const fileInputRef                      = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      setAvatarDataUrl(result);
+      setSelectedIcon("photo");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleQ = (index: number, value: number) => {
     const next = [...qValues];
@@ -140,6 +155,7 @@ export default function PersonaSetting() {
         description: getCnipDescription(scores),
         color: selectedColor,
         icon: selectedIcon,
+        avatarDataUrl,
         cnipScores: scores,
         cnipValues: [...qValues],
       };
@@ -158,6 +174,7 @@ export default function PersonaSetting() {
         description: getCnipDescription(scores),
         color: selectedColor,
         icon: selectedIcon,
+        avatarDataUrl,
         cnipScores: scores,
         cnipValues: [...qValues],
       };
@@ -225,12 +242,33 @@ export default function PersonaSetting() {
             {/* 아이콘 */}
             <div className="space-y-3">
               <label className="text-sm font-bold text-gray-700">{t.icon}</label>
-              <div className="flex gap-3 flex-wrap">
+
+              {/* 캐릭터 */}
+              <div className="flex gap-3">
+                {CHARACTER_OPTIONS.map(({ id, label, Component }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => { setSelectedIcon(id); setAvatarDataUrl(undefined); }}
+                    className={`w-14 h-14 rounded-full overflow-hidden transition-all duration-200 ${
+                      selectedIcon === id
+                        ? "ring-4 ring-offset-2 ring-[#6BCB9A] scale-110 shadow-md"
+                        : "hover:scale-105 ring-2 ring-gray-200"
+                    }`}
+                    title={label}
+                  >
+                    <Component />
+                  </button>
+                ))}
+              </div>
+
+              {/* Lucide 아이콘 */}
+              <div className="flex gap-2 flex-wrap">
                 {iconOptions.map(({ name: n, Icon }) => (
                   <button
                     key={n}
                     type="button"
-                    onClick={() => setSelectedIcon(n)}
+                    onClick={() => { setSelectedIcon(n); setAvatarDataUrl(undefined); }}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                       selectedIcon === n
                         ? "ring-4 ring-offset-2 ring-[#6BCB9A] scale-110"
@@ -242,19 +280,38 @@ export default function PersonaSetting() {
                   </button>
                 ))}
               </div>
+
+              {/* 사진 업로드 */}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoUpload}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all ${
+                    selectedIcon === "photo"
+                      ? "border-[#6BCB9A] bg-[#CFF3E4]/40 text-[#355F4B]"
+                      : "border-gray-200 text-gray-500 hover:border-[#6BCB9A]/50 hover:text-[#355F4B]"
+                  }`}
+                >
+                  <Camera className="w-4 h-4" />
+                  {avatarDataUrl ? "사진 변경" : "사진 업로드"}
+                </button>
+              </div>
             </div>
 
             {/* 미리보기 아바타 */}
-            <div className="flex flex-col items-center gap-2 py-4">
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center shadow-xl ring-4 ring-white"
-                style={{ backgroundColor: selectedColor }}
-              >
-                {(() => {
-                  const opt = iconOptions.find((o) => o.name === selectedIcon) ?? iconOptions[0];
-                  return <opt.Icon className="w-10 h-10 text-white" />;
-                })()}
-              </div>
+            <div className="flex flex-col items-center gap-2 py-2">
+              <PersonaAvatar
+                persona={{ id: "", name, mbti: "", description: "", color: selectedColor, icon: selectedIcon, avatarDataUrl }}
+                size={80}
+                ringClass="ring-4 ring-white shadow-xl"
+              />
               <p className="text-sm font-semibold text-gray-600">{name || t.namePreview}</p>
             </div>
           </div>

@@ -11,7 +11,8 @@ export interface Persona {
   mbti: string;
   description: string;
   color: string;
-  icon?: string;
+  icon?: string;           // "char1" | "char2" | "char3" | "photo" | legacy lucide name
+  avatarDataUrl?: string;  // base64 data URL for photo upload
   cnipScores?: CnipScores;
   cnipValues?: number[]; // Q1–Q18, each -3 to 3
 }

@@ -1,23 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Send, Heart, ArrowLeft, User, Ear, Users, Briefcase, Target, History, X, SlidersHorizontal } from "lucide-react";
+import { Send, ArrowLeft, History, X, SlidersHorizontal } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { Thread, Message } from "../types/thread";
 import { sendMessageToGemini, isGeminiInitialized } from "../services/gemini";
 import { calcCnipScores, getCnipDescription } from "./PersonaSetting";
 import { useLanguage } from "../contexts/LanguageContext";
 import { T } from "../i18n/translations";
-
-const getIcon = (iconName?: string) => {
-  switch (iconName) {
-    case "ear": return Ear;
-    case "users": return Users;
-    case "briefcase": return Briefcase;
-    case "target": return Target;
-    case "heart": return Heart;
-    default: return User;
-  }
-};
+import { PersonaAvatar } from "../components/PersonaAvatar";
 
 const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
 
@@ -292,34 +282,41 @@ export default function Chat() {
     : t.aiCounselor;
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] flex flex-col">
-      {/* 헤더 */}
-      <div className="bg-white shadow-md px-6 py-4 flex items-center justify-between">
+    <div className="h-screen bg-gradient-to-br from-[#F4FBF7] via-[#E8F8F1] to-[#D6F3E6] flex flex-col">
+      {/* 헤더 — frosted glass */}
+      <div className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-[#CFF3E4]/70 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/")} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
+          <button
+            onClick={() => navigate("/")}
+            className="p-2 hover:bg-gray-100/80 rounded-xl transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: persona.color }}>
-            {(() => { const I = getIcon(persona.icon); return <I className="w-6 h-6 text-white" />; })()}
-          </div>
+          <PersonaAvatar
+            persona={editedPersona ?? persona}
+            size={44}
+            ringClass="ring-2 ring-white shadow-md"
+          />
           <div>
-            <h2 className="font-semibold text-gray-800">{persona.name}</h2>
-            <p className="text-xs text-gray-400">{subtitle}</p>
+            <h2 className="font-bold text-gray-800 text-base leading-tight">
+              {(editedPersona ?? persona).name}
+            </h2>
+            <p className="text-xs text-gray-400 leading-tight">{subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-[#355F4B] rounded-full hover:bg-gray-100 transition-colors border border-gray-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#355F4B] rounded-full border border-[#CFF3E4] text-sm font-medium hover:bg-[#CFF3E4]/30 transition-colors shadow-sm"
           >
-            <History className="w-5 h-5" />
+            <History className="w-4 h-4" />
             {t.history}
           </button>
           <button
             onClick={() => setShowPersonaEdit(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#6BCB9A] text-white rounded-full hover:bg-[#355F4B] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#6BCB9A] to-[#4DB87A] text-white rounded-full text-sm font-medium hover:shadow-md hover:scale-[1.02] transition-all"
           >
-            <SlidersHorizontal className="w-5 h-5" />
+            <SlidersHorizontal className="w-4 h-4" />
             {t.adjustStyle}
           </button>
         </div>
@@ -407,7 +404,6 @@ export default function Chat() {
                 <p className="text-gray-500 text-sm text-center py-8">{t.noHistory}</p>
               ) : (
                 savedThreads.map((thread) => {
-                  const IconComponent = getIcon(thread.persona.icon);
                   return (
                     <button
                       key={thread.id}
@@ -419,12 +415,7 @@ export default function Chat() {
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: thread.persona.color }}
-                        >
-                          <IconComponent className="w-4 h-4 text-white" />
-                        </div>
+                        <PersonaAvatar persona={thread.persona} size={32} className="flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold text-sm text-gray-800 truncate">{thread.persona.name}</div>
                           <div className="text-xs text-gray-500">{t.messagesCount(thread.messages.length)}</div>
@@ -446,47 +437,90 @@ export default function Chat() {
       )}
 
       {/* 메시지 목록 */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
         {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+          message.sender === "ai" ? (
+            /* AI 메시지 */
+            <div key={message.id} className="flex items-end gap-2">
+              <PersonaAvatar
+                persona={editedPersona ?? persona}
+                size={32}
+                className="flex-shrink-0 mb-0.5 shadow-sm"
+              />
+              <div
+                className="max-w-[72%] bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border-l-[3px]"
+                style={{ borderLeftColor: (editedPersona ?? persona).color || "#6BCB9A" }}
+              >
+                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                <p className="text-xs text-gray-400 mt-1.5">
+                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* 사용자 메시지 */
+            <div key={message.id} className="flex justify-end">
+              <div className="max-w-[72%] bg-gradient-to-br from-[#6BCB9A] to-[#355F4B] rounded-2xl rounded-br-sm px-4 py-3 shadow-sm">
+                <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                <p className="text-xs text-[#CFF3E4]/80 mt-1.5">
+                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            </div>
+          )
+        ))}
+
+        {/* 타이핑 인디케이터 */}
+        {isLoadingResponse && (
+          <div className="flex items-end gap-2">
+            <PersonaAvatar
+              persona={editedPersona ?? persona}
+              size={32}
+              className="flex-shrink-0 mb-0.5 shadow-sm"
+            />
             <div
-              className={`max-w-[70%] rounded-2xl px-5 py-3 ${
-                message.sender === "user"
-                  ? "bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white"
-                  : "bg-white shadow-md text-gray-800"
-              }`}
+              className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border-l-[3px]"
+              style={{ borderLeftColor: (editedPersona ?? persona).color || "#6BCB9A" }}
             >
-              <p className="whitespace-pre-wrap">{message.text}</p>
-              <p className={`text-xs mt-2 ${message.sender === "user" ? "text-[#CFF3E4]" : "text-gray-400"}`}>
-                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </p>
+              <div className="flex items-center gap-1.5 py-0.5">
+                <span
+                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: "0ms", animationDuration: "0.9s" }}
+                />
+                <span
+                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: "180ms", animationDuration: "0.9s" }}
+                />
+                <span
+                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: "360ms", animationDuration: "0.9s" }}
+                />
+              </div>
             </div>
           </div>
-        ))}
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* 입력창 */}
-      <div className="bg-white border-t px-6 py-4">
-        {isLoadingResponse && (
-          <div className="text-sm text-gray-500 mb-2 px-5">{t.typing(persona.name)}</div>
-        )}
-        <div className="flex items-center gap-3">
+      <div className="flex-shrink-0 bg-white/90 backdrop-blur-sm border-t border-[#CFF3E4]/70 px-4 py-3">
+        <div className="flex items-center gap-2 bg-gray-50 rounded-2xl pl-4 pr-2 py-2 border border-gray-200 focus-within:border-[#6BCB9A] focus-within:ring-2 focus-within:ring-[#6BCB9A]/20 transition-all">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={t.typePlaceholder}
-            className="flex-1 px-5 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#6BCB9A] focus:border-transparent"
+            className="flex-1 bg-transparent focus:outline-none text-sm text-gray-800 placeholder:text-gray-400 py-1"
             disabled={isLoadingResponse}
           />
           <button
             onClick={handleSend}
-            className="bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white p-3 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white p-2.5 rounded-xl hover:shadow-md transition-all duration-200 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
             disabled={!input.trim() || isLoadingResponse}
           >
-            <Send className="w-6 h-6" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </div>
