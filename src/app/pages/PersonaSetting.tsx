@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart, ArrowLeft, Camera } from "lucide-react";
+import { ArrowRight, ArrowLeft, Camera } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { useLanguage } from "../contexts/LanguageContext";
 import { PersonaAvatar, CHARACTER_OPTIONS } from "../components/PersonaAvatar";
@@ -20,15 +20,6 @@ const circleSize = (v: number): string => {
 };
 
 const colorOptions = ["#6BCB9A", "#355F4B", "#EEDC82", "#CFF3E4", "#6B9ACB", "#CB6B9A"];
-const iconOptions = [
-  { name: "user",      Icon: User },
-  { name: "ear",       Icon: Ear },
-  { name: "users",     Icon: Users },
-  { name: "briefcase", Icon: Briefcase },
-  { name: "target",    Icon: Target },
-  { name: "heart",     Icon: Heart },
-];
-
 // ─── 점수 계산 (export — Chat.tsx에서도 사용) ──────────────────────────────────
 export function calcCnipScores(values: number[]): CnipScores {
   const [q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15,q16,q17,q18] = values;
@@ -258,25 +249,6 @@ export default function PersonaSetting() {
                     title={label}
                   >
                     <Component />
-                  </button>
-                ))}
-              </div>
-
-              {/* Lucide 아이콘 */}
-              <div className="flex gap-2 flex-wrap">
-                {iconOptions.map(({ name: n, Icon }) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => { setSelectedIcon(n); setAvatarDataUrl(undefined); }}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      selectedIcon === n
-                        ? "ring-4 ring-offset-2 ring-[#6BCB9A] scale-110"
-                        : "hover:scale-105 ring-2 ring-gray-200"
-                    }`}
-                    style={{ backgroundColor: selectedColor }}
-                  >
-                    <Icon className="w-5 h-5 text-white" />
                   </button>
                 ))}
               </div>
