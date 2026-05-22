@@ -8,6 +8,7 @@
  *
  * Legacy Lucide icon names still work as a colour circle fallback.
  */
+import type { CSSProperties } from "react";
 import { User, Ear, Users, Briefcase, Target, Heart } from "lucide-react";
 import { Persona } from "../types/persona";
 
@@ -144,7 +145,7 @@ export function PersonaAvatar({
   className = "",
   ringClass = "",
 }: PersonaAvatarProps) {
-  const style: React.CSSProperties = { width: size, height: size };
+  const style: CSSProperties = { width: size, height: size };
 
   // Photo upload
   if (persona.avatarDataUrl) {
