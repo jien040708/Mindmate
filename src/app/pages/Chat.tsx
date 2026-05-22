@@ -19,15 +19,18 @@ const getIcon = (iconName?: string) => {
   }
 };
 
-// C-NIP 차원 정의 (refine 다이얼로그용) — 질문은 t.questions에서 가져옴
-const cnipDimensionDef = [
-  { id: "td"  as const, qRange: [0,  4] },
-  { id: "ei"  as const, qRange: [5,  9] },
-  { id: "pao" as const, qRange: [10, 12] },
-  { id: "ws"  as const, qRange: [13, 17] },
-];
-
 const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
+
+// 중앙(0)에서 멀어질수록 커지는 원 크기 (PersonaSetting과 동일)
+const circleSize = (v: number): string => {
+  switch (Math.abs(v)) {
+    case 0: return "w-4 h-4";
+    case 1: return "w-5 h-5";
+    case 2: return "w-7 h-7";
+    case 3: return "w-9 h-9";
+    default: return "w-5 h-5";
+  }
+};
 
 function SevenCircleScale({
   value, onChange, leftLabel, rightLabel,
@@ -37,14 +40,14 @@ function SevenCircleScale({
   return (
     <div className="flex items-center gap-2 w-full">
       <span className="text-xs text-gray-500 flex-1 text-right leading-tight min-w-0 pr-1">{leftLabel}</span>
-      <div className="flex gap-1.5 flex-shrink-0">
+      <div className="flex items-center gap-1 flex-shrink-0">
         {SCALE_VALUES.map((v) => (
           <button
             key={v}
             type="button"
             onClick={() => onChange(v)}
             title={v > 0 ? `+${v}` : String(v)}
-            className={`w-5 h-5 rounded-full border-2 transition-all hover:scale-110 ${
+            className={`rounded-full border-2 transition-all hover:scale-110 flex-shrink-0 ${circleSize(v)} ${
               value === v
                 ? "bg-[#6BCB9A] border-[#355F4B] scale-110 shadow"
                 : "bg-white border-gray-300 hover:border-[#6BCB9A]"
@@ -55,16 +58,6 @@ function SevenCircleScale({
       <span className="text-xs text-gray-500 flex-1 leading-tight min-w-0 pl-1">{rightLabel}</span>
     </div>
   );
-}
-
-function getDimTitle(id: string, t: T): string {
-  switch (id) {
-    case "td":  return t.directiveness;
-    case "ei":  return t.emotionFocus;
-    case "pao": return t.timeOrientation;
-    case "ws":  return t.feedbackStyle;
-    default:    return id;
-  }
 }
 
 function computeTraitSummary(scores: CnipScores, t: T) {
@@ -364,37 +357,21 @@ export default function Chat() {
               <span><strong className="text-[#355F4B]">+3</strong> {t.scaleRight}</span>
             </div>
 
-            {/* 설문 — t.questions로 번역된 질문 표시 */}
-            <div className="space-y-8">
-              {cnipDimensionDef.map((dim) => {
-                const [start, end] = dim.qRange;
-                return (
-                  <div key={dim.id} className="space-y-4">
-                    <div className="border-l-4 border-[#6BCB9A] pl-3">
-                      <h4 className="font-bold text-sm text-gray-700">{getDimTitle(dim.id, t)}</h4>
-                    </div>
-                    <div className="space-y-4">
-                      {Array.from({ length: end - start + 1 }, (_, qi) => {
-                        const idx = start + qi;
-                        const q   = t.questions[idx];
-                        return (
-                          <div key={qi} className="space-y-1">
-                            <span className="inline-block bg-[#CFF3E4] text-[#355F4B] text-xs font-bold px-2 py-0.5 rounded-full">
-                              Q{idx + 1}
-                            </span>
-                            <SevenCircleScale
-                              value={cnipValues[idx]}
-                              onChange={(v) => handleCnipQ(idx, v)}
-                              leftLabel={q.left}
-                              rightLabel={q.right}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+            {/* 설문 — Q1~Q18 평면 나열, 카테고리 구분 없음 */}
+            <div className="space-y-5">
+              {t.questions.map((q, i) => (
+                <div key={i} className="space-y-1">
+                  <span className="inline-block bg-[#CFF3E4] text-[#355F4B] text-xs font-bold px-2 py-0.5 rounded-full">
+                    Q{i + 1}
+                  </span>
+                  <SevenCircleScale
+                    value={cnipValues[i]}
+                    onChange={(v) => handleCnipQ(i, v)}
+                    leftLabel={q.left}
+                    rightLabel={q.right}
+                  />
+                </div>
+              ))}
             </div>
 
             <div className="flex gap-3 mt-8">
