@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router';
 import { router } from './routes.tsx';
 import Splash from './components/Splash';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import { Toaster } from './components/ui/sonner';
 
 export default function App() {
@@ -16,14 +17,16 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (showSplash) {
-    return <Splash />;
-  }
-
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
-    </AuthProvider>
+    <LanguageProvider>
+      {showSplash ? (
+        <Splash />
+      ) : (
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </AuthProvider>
+      )}
+    </LanguageProvider>
   );
 }

@@ -1,33 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { ArrowRight, User, Ear, Users, Briefcase, Target, Heart, ArrowLeft } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
-
-// ─── C-NIP 18문항 (카테고리명 없이 평탄하게) ───────────────────────────────────
-const cnipQuestions = [
-  // TD (Q1-Q5)
-  { left: "뚜렷한 목표를 세우고 상담하기",       right: "특별한 목표 없이 자유롭게 상담하기" },
-  { left: "체계적인 방식으로 대화 이끌기",        right: "정해진 틀 없이 편안하게 대화하기" },
-  { left: "문제 해결에 필요한 기술 알려주기",     right: "구체적인 기술 가르치지 않기" },
-  { left: "상담 후 과제(숙제) 내주기",           right: "별도의 과제나 숙제 주지 않기" },
-  { left: "AI 상담가가 대화를 주도하기",         right: "내가 원하는 방향으로 대화 주도하기" },
-  // EI (Q6-Q10)
-  { left: "불편한 감정도 깊이 다루도록 격려하기", right: "굳이 불편한 감정을 들추지 않기" },
-  { left: "AI와 나의 상담 관계에 대해 이야기하기",right: "상담 관계보다 내 문제 자체에 집중하기" },
-  { left: "나와 AI의 상호작용에 집중하기",       right: "상호작용보다 내 문제 자체에 집중하기" },
-  { left: "강렬한 감정을 솔직하게 쏟아내도록 격려하기", right: "강렬한 감정 표출을 굳이 유도하지 않기" },
-  { left: "내 '감정'을 중심으로 다루기",         right: "내 '생각과 논리'를 중심으로 다루기" },
-  // PaO (Q11-Q13)
-  { left: "과거의 내 삶과 경험에 집중하기",      right: "현재의 내 삶과 상황에 집중하기" },
-  { left: "어린 시절의 기억과 경험 돌아보기",    right: "성인이 된 이후의 삶에 초점 맞추기" },
-  { left: "지나온 나의 과거에 집중하기",         right: "앞으로 다가올 미래에 집중하기" },
-  // WS (Q14-Q18)
-  { left: "부드럽고 온화하게 다가오기",          right: "다소 날카롭더라도 직면할 수 있게 자극하기" },
-  { left: "내 입장을 전적으로 지지하고 공감하기", right: "내 생각의 모순이나 문제점을 지적하기" },
-  { left: "대화 중 내 말을 끊지 않고 끝까지 듣기",right: "주제 벗어나면 말을 끊어서라도 초점 잡아주기" },
-  { left: "내 가치관이나 신념에 의문 제기하지 않기",right: "내 가치관이나 신념이 맞는지 이성적으로 짚어보기" },
-  { left: "내 행동을 무조건적으로 긍정하고 지지하기",right: "내 행동에 잘못된 점이 있다면 명확히 지적하기" },
-];
+import { useLanguage } from "../contexts/LanguageContext";
 
 const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
 
@@ -128,11 +103,19 @@ function SevenCircleScale({
 
 // ─── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 export default function PersonaSetting() {
-  const navigate = useNavigate();
-  const [qValues, setQValues]         = useState<number[]>(Array(18).fill(0));
-  const [name, setName]               = useState("");
-  const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
-  const [selectedIcon, setSelectedIcon]   = useState(iconOptions[0].name);
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const { t }     = useLanguage();
+
+  const editPersona = location.state?.editPersona as Persona | undefined;
+  const isEdit      = !!editPersona;
+
+  const [qValues, setQValues]             = useState<number[]>(
+    () => editPersona?.cnipValues ?? Array(18).fill(0)
+  );
+  const [name, setName]                   = useState(editPersona?.name ?? "");
+  const [selectedColor, setSelectedColor] = useState(editPersona?.color ?? colorOptions[0]);
+  const [selectedIcon, setSelectedIcon]   = useState(editPersona?.icon ?? iconOptions[0].name);
 
   const handleQ = (index: number, value: number) => {
     const next = [...qValues];
@@ -140,26 +123,47 @@ export default function PersonaSetting() {
     setQValues(next);
   };
 
-  const handleCreate = () => {
-    if (!name.trim()) { alert("상담가 이름을 입력해 주세요."); return; }
+  const handleSave = () => {
     const trimmedName = name.trim();
+    if (!trimmedName) { alert(t.nameRequired); return; }
+
     const saved: Persona[] = JSON.parse(localStorage.getItem("personas") || "[]");
-    if (saved.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
-      alert(`"${trimmedName}" 이름이 이미 존재해요.`); return;
+
+    if (isEdit && editPersona) {
+      if (saved.some((p) => p.id !== editPersona.id && p.name.toLowerCase() === trimmedName.toLowerCase())) {
+        alert(t.nameDuplicate(trimmedName)); return;
+      }
+      const scores = calcCnipScores(qValues);
+      const updated: Persona = {
+        ...editPersona,
+        name: trimmedName,
+        description: getCnipDescription(scores),
+        color: selectedColor,
+        icon: selectedIcon,
+        cnipScores: scores,
+        cnipValues: [...qValues],
+      };
+      const idx = saved.findIndex((p) => p.id === editPersona.id);
+      if (idx >= 0) saved[idx] = updated;
+      localStorage.setItem("personas", JSON.stringify(saved));
+    } else {
+      if (saved.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
+        alert(t.nameDuplicate(trimmedName)); return;
+      }
+      const scores = calcCnipScores(qValues);
+      const newPersona: Persona = {
+        id: Date.now().toString(),
+        name: trimmedName,
+        mbti: "",
+        description: getCnipDescription(scores),
+        color: selectedColor,
+        icon: selectedIcon,
+        cnipScores: scores,
+        cnipValues: [...qValues],
+      };
+      saved.push(newPersona);
+      localStorage.setItem("personas", JSON.stringify(saved));
     }
-    const scores = calcCnipScores(qValues);
-    const newPersona: Persona = {
-      id: Date.now().toString(),
-      name: trimmedName,
-      mbti: "",
-      description: getCnipDescription(scores),
-      color: selectedColor,
-      icon: selectedIcon,
-      cnipScores: scores,
-      cnipValues: [...qValues],
-    };
-    saved.push(newPersona);
-    localStorage.setItem("personas", JSON.stringify(saved));
     navigate("/");
   };
 
@@ -172,10 +176,10 @@ export default function PersonaSetting() {
           onClick={() => navigate("/")}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full shadow text-sm font-semibold text-[#355F4B] border border-[#CFF3E4] hover:shadow-md transition-all"
         >
-          <ArrowLeft className="w-4 h-4" /> 돌아가기
+          <ArrowLeft className="w-4 h-4" /> {t.back}
         </button>
         <h1 className="text-lg font-bold bg-gradient-to-r from-[#355F4B] to-[#6BCB9A] bg-clip-text text-transparent">
-          나만의 상담가 만들기
+          {isEdit ? t.editCounselor : t.createCounselor}
         </h1>
       </div>
 
@@ -189,20 +193,20 @@ export default function PersonaSetting() {
             {/* 이름 */}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-700">
-                상담가 이름 <span className="text-red-400">*</span>
+                {t.counselorName} <span className="text-red-400">{t.required}</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="이름을 입력하세요"
+                placeholder={t.namePlaceholder}
                 className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#6BCB9A] bg-white text-gray-800"
               />
             </div>
 
             {/* 색상 */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-gray-700">색상</label>
+              <label className="text-sm font-bold text-gray-700">{t.color}</label>
               <div className="flex gap-3 flex-wrap">
                 {colorOptions.map((color) => (
                   <button
@@ -220,7 +224,7 @@ export default function PersonaSetting() {
 
             {/* 아이콘 */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-gray-700">아이콘</label>
+              <label className="text-sm font-bold text-gray-700">{t.icon}</label>
               <div className="flex gap-3 flex-wrap">
                 {iconOptions.map(({ name: n, Icon }) => (
                   <button
@@ -251,17 +255,17 @@ export default function PersonaSetting() {
                   return <opt.Icon className="w-10 h-10 text-white" />;
                 })()}
               </div>
-              <p className="text-sm font-semibold text-gray-600">{name || "이름 미입력"}</p>
+              <p className="text-sm font-semibold text-gray-600">{name || t.namePreview}</p>
             </div>
           </div>
 
-          {/* 만들기 버튼 */}
+          {/* 저장 버튼 */}
           <div className="flex-shrink-0 px-10 py-5 border-t border-[#CFF3E4] bg-white/40">
             <button
-              onClick={handleCreate}
+              onClick={handleSave}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white font-bold text-base hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
             >
-              상담가 만들기 <ArrowRight className="w-5 h-5" />
+              {isEdit ? t.saveChanges : t.createBtn} <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -271,17 +275,17 @@ export default function PersonaSetting() {
 
           {/* 헤더 (고정) */}
           <div className="flex-shrink-0 px-8 py-4 border-b border-[#CFF3E4] bg-white/60 backdrop-blur-sm">
-            <h2 className="font-bold text-gray-800 text-sm">C-NIP 상담 스타일 설문</h2>
+            <h2 className="font-bold text-gray-800 text-sm">{t.cnipSurvey}</h2>
             <div className="flex gap-5 mt-1.5 text-xs text-gray-400">
-              <span><span className="font-bold text-[#355F4B]">-3</span> 왼쪽 강하게 선호</span>
-              <span><span className="font-bold text-gray-400">0</span> 중립</span>
-              <span><span className="font-bold text-[#355F4B]">+3</span> 오른쪽 강하게 선호</span>
+              <span><span className="font-bold text-[#355F4B]">-3</span> {t.scaleLeft}</span>
+              <span><span className="font-bold text-gray-400">0</span> {t.scaleNeutral}</span>
+              <span><span className="font-bold text-[#355F4B]">+3</span> {t.scaleRight}</span>
             </div>
           </div>
 
           {/* 설문 (이 영역만 스크롤) */}
           <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
-            {cnipQuestions.map((q, i) => (
+            {t.questions.map((q, i) => (
               <div key={i} className="space-y-2">
                 <span className="inline-block bg-[#CFF3E4] text-[#355F4B] text-xs font-bold px-2 py-0.5 rounded-full">
                   Q{i + 1}
@@ -294,7 +298,6 @@ export default function PersonaSetting() {
                 />
               </div>
             ))}
-            {/* 여백 */}
             <div className="h-4" />
           </div>
         </div>
