@@ -282,79 +282,101 @@ export default function Chat() {
     : t.aiCounselor;
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#F4FBF7] via-[#E8F8F1] to-[#D6F3E6] flex flex-col">
-      {/* 헤더 — frosted glass */}
-      <div className="flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-[#CFF3E4]/70 px-4 py-3 flex items-center justify-between shadow-sm">
+    {/* ── 배경 레이어 ── */}
+    <div className="h-screen flex flex-col relative overflow-hidden">
+
+      {/* 배경: 깊이감 있는 그라디언트 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#daf2e7] via-[#c2e8d4] to-[#9dd4b8]" />
+      {/* 배경 장식 blob */}
+      <div className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none opacity-40"
+        style={{ background: "radial-gradient(circle, #a8e6c8 0%, transparent 70%)" }} />
+      <div className="absolute -bottom-40 -left-24 w-[420px] h-[420px] rounded-full blur-3xl pointer-events-none opacity-30"
+        style={{ background: "radial-gradient(circle, #5aab7d 0%, transparent 70%)" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-3xl pointer-events-none opacity-10"
+        style={{ background: "radial-gradient(ellipse, #ffffff 0%, transparent 70%)" }} />
+
+      {/* ── 헤더 ── */}
+      <div className="relative z-10 flex-shrink-0 flex items-center justify-between px-5 py-3.5
+                      bg-white/40 backdrop-blur-2xl border-b border-white/50
+                      shadow-[0_1px_24px_rgba(0,0,0,0.06)]">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
-            className="p-2 hover:bg-gray-100/80 rounded-xl transition-colors"
+            className="p-2 rounded-xl bg-white/50 hover:bg-white/80 border border-white/60 transition-all shadow-sm"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-500" />
+            <ArrowLeft className="w-4 h-4 text-[#355F4B]" />
           </button>
           <PersonaAvatar
             persona={editedPersona ?? persona}
-            size={44}
-            ringClass="ring-2 ring-white shadow-md"
+            size={42}
+            ringClass="ring-2 ring-white/80 shadow-lg"
           />
           <div>
-            <h2 className="font-bold text-gray-800 text-base leading-tight">
+            <h2 className="font-bold text-[#1a3d2b] text-base leading-tight tracking-tight">
               {(editedPersona ?? persona).name}
             </h2>
-            <p className="text-xs text-gray-400 leading-tight">{subtitle}</p>
+            <p className="text-[11px] text-[#355F4B]/70 leading-tight mt-0.5">{subtitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#355F4B] rounded-full border border-[#CFF3E4] text-sm font-medium hover:bg-[#CFF3E4]/30 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                       bg-white/50 hover:bg-white/80 border border-white/60
+                       text-[#355F4B] text-xs font-semibold transition-all shadow-sm"
           >
-            <History className="w-4 h-4" />
+            <History className="w-3.5 h-3.5" />
             {t.history}
           </button>
           <button
             onClick={() => setShowPersonaEdit(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#6BCB9A] to-[#4DB87A] text-white rounded-full text-sm font-medium hover:shadow-md hover:scale-[1.02] transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                       bg-[#355F4B]/80 hover:bg-[#355F4B] backdrop-blur-sm
+                       text-white text-xs font-semibold transition-all shadow-sm hover:shadow-md"
           >
-            <SlidersHorizontal className="w-4 h-4" />
+            <SlidersHorizontal className="w-3.5 h-3.5" />
             {t.adjustStyle}
           </button>
         </div>
       </div>
 
-      {/* C-NIP Refine 다이얼로그 */}
+      {/* ── C-NIP 다이얼로그 ── */}
       {showPersonaEdit && editedPersona && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+             style={{ backdropFilter: "blur(16px)", background: "rgba(0,0,0,0.35)" }}>
+          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-8 max-w-2xl w-full
+                          shadow-[0_24px_80px_rgba(0,0,0,0.2)] border border-white/60
+                          max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">{t.adjustStyle}</h3>
               <button
                 onClick={() => { setShowPersonaEdit(false); setCnipValues(persona.cnipValues ?? Array(18).fill(0)); }}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
-            {/* 현재 성향 요약 */}
+            {/* 성향 요약 */}
             <div className="grid grid-cols-2 gap-2 mb-6">
               {traitSummary.map((tr) => (
-                <div key={tr.dimLabel} className="bg-gray-50 rounded-xl px-3 py-2">
-                  <p className="text-xs text-gray-400">{tr.dimLabel}</p>
-                  <p className={`text-sm font-bold ${tr.color}`}>{tr.label}</p>
-                  <p className="text-xs text-gray-500 leading-tight">{tr.desc}</p>
+                <div key={tr.dimLabel} className="bg-gray-50/80 rounded-2xl px-3 py-2.5 border border-gray-100">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">{tr.dimLabel}</p>
+                  <p className={`text-sm font-bold mt-0.5 ${tr.color}`}>{tr.label}</p>
+                  <p className="text-xs text-gray-500 leading-tight mt-0.5">{tr.desc}</p>
                 </div>
               ))}
             </div>
 
-            {/* 눈금 설명 */}
-            <div className="bg-[#CFF3E4]/40 rounded-xl p-3 text-xs text-gray-500 flex gap-4 flex-wrap justify-center mb-6">
+            {/* 눈금 안내 */}
+            <div className="bg-[#CFF3E4]/50 rounded-2xl px-4 py-2.5 text-xs text-gray-500
+                            flex gap-5 flex-wrap justify-center mb-6 border border-[#CFF3E4]">
               <span><strong className="text-[#355F4B]">-3</strong> {t.scaleLeft}</span>
               <span><strong className="text-gray-400">0</strong> {t.scaleNeutral}</span>
               <span><strong className="text-[#355F4B]">+3</strong> {t.scaleRight}</span>
             </div>
 
-            {/* 설문 — Q1~Q18 평면 나열, 카테고리 구분 없음 */}
+            {/* Q1–Q18 */}
             <div className="space-y-5">
               {t.questions.map((q, i) => (
                 <div key={i} className="space-y-1">
@@ -374,13 +396,13 @@ export default function Chat() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={handleApplyPersonaChanges}
-                className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all"
+                className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all"
               >
                 {t.apply}
               </button>
               <button
                 onClick={() => { setShowPersonaEdit(false); setCnipValues(persona.cnipValues ?? Array(18).fill(0)); }}
-                className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition-all"
+                className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
               >
                 {t.cancel}
               </button>
@@ -389,80 +411,92 @@ export default function Chat() {
         </div>
       )}
 
-      {/* 기록 사이드바 */}
+      {/* ── 기록 사이드바 ── */}
       {showHistorySidebar && (
-        <div className="fixed inset-y-0 right-0 w-80 bg-white shadow-2xl z-40 overflow-y-auto">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">{t.chatHistory}</h2>
-              <button onClick={() => setShowHistorySidebar(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                <X className="w-5 h-5 text-gray-600" />
+        <>
+          {/* 딤 오버레이 */}
+          <div
+            className="fixed inset-0 z-30"
+            style={{ backdropFilter: "blur(4px)", background: "rgba(0,0,0,0.2)" }}
+            onClick={() => setShowHistorySidebar(false)}
+          />
+          <div className="fixed inset-y-0 right-0 w-80 z-40 flex flex-col
+                          bg-white/70 backdrop-blur-2xl border-l border-white/50
+                          shadow-[−8px_0_40px_rgba(0,0,0,0.12)]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/40">
+              <h2 className="text-base font-bold text-[#1a3d2b]">{t.chatHistory}</h2>
+              <button
+                onClick={() => setShowHistorySidebar(false)}
+                className="p-1.5 hover:bg-white/60 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
               {savedThreads.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-8">{t.noHistory}</p>
+                <p className="text-gray-400 text-sm text-center py-12">{t.noHistory}</p>
               ) : (
-                savedThreads.map((thread) => {
-                  return (
-                    <button
-                      key={thread.id}
-                      onClick={() => handleThreadSelect(thread)}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all hover:shadow-md ${
-                        thread.id === threadId
-                          ? "border-[#6BCB9A] bg-[#CFF3E4]/30"
-                          : "border-gray-200 hover:border-[#6BCB9A]/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <PersonaAvatar persona={thread.persona} size={32} className="flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm text-gray-800 truncate">{thread.persona.name}</div>
-                          <div className="text-xs text-gray-500">{t.messagesCount(thread.messages.length)}</div>
-                        </div>
+                savedThreads.map((thread) => (
+                  <button
+                    key={thread.id}
+                    onClick={() => handleThreadSelect(thread)}
+                    className={`w-full text-left p-3.5 rounded-2xl border transition-all ${
+                      thread.id === threadId
+                        ? "bg-[#355F4B]/10 border-[#6BCB9A]/60 shadow-sm"
+                        : "bg-white/40 border-white/50 hover:bg-white/70 hover:border-white/80"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <PersonaAvatar persona={thread.persona} size={30} className="flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-gray-800 truncate">{thread.persona.name}</div>
+                        <div className="text-[10px] text-gray-400">{t.messagesCount(thread.messages.length)}</div>
                       </div>
-                      <p className="text-xs text-gray-600 line-clamp-2">
-                        {thread.messages[thread.messages.length - 1]?.text}
-                      </p>
-                      <div className="text-xs text-gray-400 mt-2">
-                        {thread.createdAt.toLocaleDateString()}
-                      </div>
-                    </button>
-                  );
-                })
+                    </div>
+                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                      {thread.messages[thread.messages.length - 1]?.text}
+                    </p>
+                    <div className="text-[10px] text-gray-400 mt-1.5">
+                      {thread.createdAt.toLocaleDateString()}
+                    </div>
+                  </button>
+                ))
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* 메시지 목록 */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-3">
+      {/* ── 메시지 영역 ── */}
+      <div className="relative z-0 flex-1 overflow-y-auto px-5 py-6 space-y-4">
         {messages.map((message) => (
           message.sender === "ai" ? (
-            /* AI 메시지 */
-            <div key={message.id} className="flex items-end gap-2">
+            <div key={message.id} className="flex items-end gap-2.5">
               <PersonaAvatar
                 persona={editedPersona ?? persona}
-                size={32}
-                className="flex-shrink-0 mb-0.5 shadow-sm"
+                size={34}
+                className="flex-shrink-0 shadow-md"
+                ringClass="ring-2 ring-white/70"
               />
               <div
-                className="max-w-[72%] bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border-l-[3px]"
-                style={{ borderLeftColor: (editedPersona ?? persona).color || "#6BCB9A" }}
+                className="max-w-[68%] rounded-2xl rounded-bl-sm px-4 py-3
+                            bg-white/70 backdrop-blur-sm border border-white/60
+                            shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+                style={{ borderLeft: `3px solid ${(editedPersona ?? persona).color || "#6BCB9A"}` }}
               >
                 <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                <p className="text-xs text-gray-400 mt-1.5">
+                <p className="text-[10px] text-gray-400 mt-1.5 text-right">
                   {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
             </div>
           ) : (
-            /* 사용자 메시지 */
             <div key={message.id} className="flex justify-end">
-              <div className="max-w-[72%] bg-gradient-to-br from-[#6BCB9A] to-[#355F4B] rounded-2xl rounded-br-sm px-4 py-3 shadow-sm">
+              <div className="max-w-[68%] rounded-2xl rounded-br-sm px-4 py-3
+                              shadow-[0_4px_20px_rgba(53,95,75,0.25)]"
+                   style={{ background: "linear-gradient(135deg, #6BCB9A 0%, #2d5a3d 100%)" }}>
                 <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                <p className="text-xs text-[#CFF3E4]/80 mt-1.5">
+                <p className="text-[10px] text-white/50 mt-1.5 text-right">
                   {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
@@ -472,29 +506,32 @@ export default function Chat() {
 
         {/* 타이핑 인디케이터 */}
         {isLoadingResponse && (
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-2.5">
             <PersonaAvatar
               persona={editedPersona ?? persona}
-              size={32}
-              className="flex-shrink-0 mb-0.5 shadow-sm"
+              size={34}
+              className="flex-shrink-0 shadow-md"
+              ringClass="ring-2 ring-white/70"
             />
             <div
-              className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border-l-[3px]"
-              style={{ borderLeftColor: (editedPersona ?? persona).color || "#6BCB9A" }}
+              className="rounded-2xl rounded-bl-sm px-4 py-3.5
+                          bg-white/70 backdrop-blur-sm border border-white/60
+                          shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+              style={{ borderLeft: `3px solid ${(editedPersona ?? persona).color || "#6BCB9A"}` }}
             >
-              <div className="flex items-center gap-1.5 py-0.5">
-                <span
-                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
-                  style={{ animationDelay: "0ms", animationDuration: "0.9s" }}
-                />
-                <span
-                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
-                  style={{ animationDelay: "180ms", animationDuration: "0.9s" }}
-                />
-                <span
-                  className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
-                  style={{ animationDelay: "360ms", animationDuration: "0.9s" }}
-                />
+              <div className="flex items-center gap-1.5">
+                {[0, 160, 320].map((delay) => (
+                  <span
+                    key={delay}
+                    className="w-2 h-2 rounded-full animate-bounce"
+                    style={{
+                      animationDelay: `${delay}ms`,
+                      animationDuration: "1s",
+                      background: (editedPersona ?? persona).color || "#6BCB9A",
+                      opacity: 0.5,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -503,22 +540,35 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 입력창 */}
-      <div className="flex-shrink-0 bg-white/90 backdrop-blur-sm border-t border-[#CFF3E4]/70 px-4 py-3">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-2xl pl-4 pr-2 py-2 border border-gray-200 focus-within:border-[#6BCB9A] focus-within:ring-2 focus-within:ring-[#6BCB9A]/20 transition-all">
+      {/* ── 입력창 ── */}
+      <div className="relative z-10 flex-shrink-0 px-4 pb-5 pt-3
+                      bg-white/30 backdrop-blur-2xl border-t border-white/40
+                      shadow-[0_-8px_32px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center gap-2.5
+                        bg-white/70 backdrop-blur-sm rounded-2xl
+                        pl-5 pr-2 py-2.5
+                        border border-white/70
+                        shadow-[0_2px_16px_rgba(0,0,0,0.07)]
+                        focus-within:border-[#6BCB9A]/60 focus-within:shadow-[0_2px_20px_rgba(107,203,154,0.2)]
+                        transition-all duration-200">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={t.typePlaceholder}
-            className="flex-1 bg-transparent focus:outline-none text-sm text-gray-800 placeholder:text-gray-400 py-1"
+            className="flex-1 bg-transparent focus:outline-none text-sm text-gray-800 placeholder:text-gray-400 py-0.5"
             disabled={isLoadingResponse}
           />
           <button
             onClick={handleSend}
-            className="bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white p-2.5 rounded-xl hover:shadow-md transition-all duration-200 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
             disabled={!input.trim() || isLoadingResponse}
+            className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center
+                       bg-gradient-to-br from-[#6BCB9A] to-[#2d5a3d]
+                       text-white shadow-md
+                       hover:shadow-lg hover:scale-105
+                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100
+                       transition-all duration-200"
           >
             <Send className="w-4 h-4" />
           </button>
