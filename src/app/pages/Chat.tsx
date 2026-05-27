@@ -13,567 +13,847 @@ const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
 
 // 중앙(0)에서 멀어질수록 커지는 원 크기 (PersonaSetting과 동일)
 const circleSize = (v: number): string => {
-  switch (Math.abs(v)) {
-    case 0: return "w-4 h-4";
-    case 1: return "w-5 h-5";
-    case 2: return "w-7 h-7";
-    case 3: return "w-9 h-9";
-    default: return "w-5 h-5";
-  }
+    switch (Math.abs(v)) {
+        case 0:
+            return "w-4 h-4";
+        case 1:
+            return "w-5 h-5";
+        case 2:
+            return "w-7 h-7";
+        case 3:
+            return "w-9 h-9";
+        default:
+            return "w-5 h-5";
+    }
 };
 
 function SevenCircleScale({
-  value, onChange, leftLabel, rightLabel,
+    value,
+    onChange,
+    leftLabel,
+    rightLabel,
 }: {
-  value: number; onChange: (v: number) => void; leftLabel: string; rightLabel: string;
+    value: number;
+    onChange: (v: number) => void;
+    leftLabel: string;
+    rightLabel: string;
 }) {
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <span className="text-xs text-gray-500 flex-1 text-right leading-tight min-w-0 pr-1">{leftLabel}</span>
-      <div className="flex items-center gap-1 flex-shrink-0">
-        {SCALE_VALUES.map((v) => (
-          <button
-            key={v}
-            type="button"
-            onClick={() => onChange(v)}
-            title={v > 0 ? `+${v}` : String(v)}
-            className={`rounded-full border-2 transition-all hover:scale-110 flex-shrink-0 ${circleSize(v)} ${
-              value === v
-                ? "bg-[#6BCB9A] border-[#355F4B] scale-110 shadow"
-                : "bg-white border-gray-300 hover:border-[#6BCB9A]"
-            }`}
-          />
-        ))}
-      </div>
-      <span className="text-xs text-gray-500 flex-1 leading-tight min-w-0 pl-1">{rightLabel}</span>
-    </div>
-  );
+    return (
+        <div className="flex items-center gap-2 w-full">
+            <span className="text-xs text-gray-500 flex-1 text-right leading-tight min-w-0 pr-1">
+                {leftLabel}
+            </span>
+            <div className="flex items-center gap-1 flex-shrink-0">
+                {SCALE_VALUES.map((v) => (
+                    <button
+                        key={v}
+                        type="button"
+                        onClick={() => onChange(v)}
+                        title={v > 0 ? `+${v}` : String(v)}
+                        className={`rounded-full border-2 transition-all hover:scale-110 flex-shrink-0 ${circleSize(
+                            v
+                        )} ${
+                            value === v
+                                ? "bg-[#6BCB9A] border-[#6BCB9A] scale-110 shadow"
+                                : "bg-white border-gray-300 hover:border-[#6BCB9A]"
+                        }`}
+                    />
+                ))}
+            </div>
+            <span className="text-xs text-gray-500 flex-1 leading-tight min-w-0 pl-1">
+                {rightLabel}
+            </span>
+        </div>
+    );
 }
 
 function computeTraitSummary(scores: CnipScores, t: T) {
-  return [
-    {
-      dimLabel: t.directiveness,
-      label: scores.td  >= 8  ? t.traitTD_high  : scores.td  <= -3 ? t.traitTD_low  : t.traitTD_mid,
-      desc:  scores.td  >= 8  ? t.descTD_high   : scores.td  <= -3 ? t.descTD_low   : t.descTD_mid,
-      color: scores.td  >= 8  ? "text-blue-600" : scores.td  <= -3 ? "text-purple-600" : "text-green-600",
-    },
-    {
-      dimLabel: t.emotionFocus,
-      label: scores.ei  >= 7  ? t.traitEI_high  : scores.ei  <= -1 ? t.traitEI_low  : t.traitEI_mid,
-      desc:  scores.ei  >= 7  ? t.descEI_high   : scores.ei  <= -1 ? t.descEI_low   : t.descEI_mid,
-      color: scores.ei  >= 7  ? "text-rose-600" : scores.ei  <= -1 ? "text-sky-600"  : "text-green-600",
-    },
-    {
-      dimLabel: t.timeOrientation,
-      label: scores.pao >= 3  ? t.traitPaO_high : scores.pao <= -3 ? t.traitPaO_low : t.traitPaO_mid,
-      desc:  scores.pao >= 3  ? t.descPaO_high  : scores.pao <= -3 ? t.descPaO_low  : t.descPaO_mid,
-      color: scores.pao >= 3  ? "text-amber-600": scores.pao <= -3 ? "text-teal-600" : "text-green-600",
-    },
-    {
-      dimLabel: t.feedbackStyle,
-      label: scores.ws  >= 4  ? t.traitWS_high  : scores.ws  <= -4 ? t.traitWS_low  : t.traitWS_mid,
-      desc:  scores.ws  >= 4  ? t.descWS_high   : scores.ws  <= -4 ? t.descWS_low   : t.descWS_mid,
-      color: scores.ws  >= 4  ? "text-orange-500":scores.ws  <= -4 ? "text-red-600"  : "text-green-600",
-    },
-  ];
+    return [
+        {
+            dimLabel: t.directiveness,
+            label:
+                scores.td >= 8
+                    ? t.traitTD_high
+                    : scores.td <= -3
+                    ? t.traitTD_low
+                    : t.traitTD_mid,
+            desc:
+                scores.td >= 8
+                    ? t.descTD_high
+                    : scores.td <= -3
+                    ? t.descTD_low
+                    : t.descTD_mid,
+            color:
+                scores.td >= 8
+                    ? "text-blue-600"
+                    : scores.td <= -3
+                    ? "text-purple-600"
+                    : "text-green-600",
+        },
+        {
+            dimLabel: t.emotionFocus,
+            label:
+                scores.ei >= 7
+                    ? t.traitEI_high
+                    : scores.ei <= -1
+                    ? t.traitEI_low
+                    : t.traitEI_mid,
+            desc:
+                scores.ei >= 7
+                    ? t.descEI_high
+                    : scores.ei <= -1
+                    ? t.descEI_low
+                    : t.descEI_mid,
+            color:
+                scores.ei >= 7
+                    ? "text-rose-600"
+                    : scores.ei <= -1
+                    ? "text-sky-600"
+                    : "text-green-600",
+        },
+        {
+            dimLabel: t.timeOrientation,
+            label:
+                scores.pao >= 3
+                    ? t.traitPaO_high
+                    : scores.pao <= -3
+                    ? t.traitPaO_low
+                    : t.traitPaO_mid,
+            desc:
+                scores.pao >= 3
+                    ? t.descPaO_high
+                    : scores.pao <= -3
+                    ? t.descPaO_low
+                    : t.descPaO_mid,
+            color:
+                scores.pao >= 3
+                    ? "text-amber-600"
+                    : scores.pao <= -3
+                    ? "text-teal-600"
+                    : "text-green-600",
+        },
+        {
+            dimLabel: t.feedbackStyle,
+            label:
+                scores.ws >= 4
+                    ? t.traitWS_high
+                    : scores.ws <= -4
+                    ? t.traitWS_low
+                    : t.traitWS_mid,
+            desc:
+                scores.ws >= 4
+                    ? t.descWS_high
+                    : scores.ws <= -4
+                    ? t.descWS_low
+                    : t.descWS_mid,
+            color:
+                scores.ws >= 4
+                    ? "text-orange-500"
+                    : scores.ws <= -4
+                    ? "text-red-600"
+                    : "text-green-600",
+        },
+    ];
 }
 
 function computeSubtitle(scores: CnipScores, t: T): string {
-  const td  = scores.td  >= 8  ? t.traitTD_high  : scores.td  <= -3 ? t.traitTD_low  : t.traitTD_mid;
-  const ei  = scores.ei  >= 7  ? t.traitEI_high  : scores.ei  <= -1 ? t.traitEI_low  : t.traitEI_mid;
-  const pao = scores.pao >= 3  ? t.traitPaO_high : scores.pao <= -3 ? t.traitPaO_low : t.traitPaO_mid;
-  const ws  = scores.ws  >= 4  ? t.traitWS_high  : scores.ws  <= -4 ? t.traitWS_low  : t.traitWS_mid;
-  return `${td} · ${ei} · ${pao} · ${ws}`;
+    const td =
+        scores.td >= 8
+            ? t.traitTD_high
+            : scores.td <= -3
+            ? t.traitTD_low
+            : t.traitTD_mid;
+    const ei =
+        scores.ei >= 7
+            ? t.traitEI_high
+            : scores.ei <= -1
+            ? t.traitEI_low
+            : t.traitEI_mid;
+    const pao =
+        scores.pao >= 3
+            ? t.traitPaO_high
+            : scores.pao <= -3
+            ? t.traitPaO_low
+            : t.traitPaO_mid;
+    const ws =
+        scores.ws >= 4
+            ? t.traitWS_high
+            : scores.ws <= -4
+            ? t.traitWS_low
+            : t.traitWS_mid;
+    return `${td} · ${ei} · ${pao} · ${ws}`;
 }
 
 export default function Chat() {
-  const location  = useLocation();
-  const navigate  = useNavigate();
-  const { language, t } = useLanguage();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { language, t } = useLanguage();
 
-  const existingThread = location.state?.thread as Thread | undefined;
-  const persona = existingThread?.persona || (location.state?.persona as Persona);
-  const mood    = existingThread?.mood    || (location.state?.mood as number | undefined);
+    const existingThread = location.state?.thread as Thread | undefined;
+    const persona =
+        existingThread?.persona || (location.state?.persona as Persona);
+    const mood =
+        existingThread?.mood || (location.state?.mood as number | undefined);
 
-  const getMoodContext = (moodValue?: number) => {
-    if (moodValue === undefined) return "";
-    switch (language) {
-      case "English":
-        if (moodValue < 20) return " I can see you're having a tough day. Feel free to share.";
-        if (moodValue < 40) return " Sounds like things are a bit rough. I'm here to listen.";
-        if (moodValue < 60) return " How are you doing? Feel free to share anything.";
-        if (moodValue < 80) return " Glad you're feeling good!";
-        return " You seem to be in great spirits today!";
-      case "Japanese":
-        if (moodValue < 20) return " 今日はとても辛そうですね。気軽に話してください。";
-        if (moodValue < 40) return " 少し辛そうですね。聞かせてください。";
-        if (moodValue < 60) return " 今日はどうですか？何でも話してください。";
-        if (moodValue < 80) return " 気分が良さそうですね！";
-        return " 今日はとても元気そうですね！";
-      case "Chinese":
-        if (moodValue < 20) return " 今天看起来很难受。请随便说说吧。";
-        if (moodValue < 40) return " 听起来有点辛苦。我在这里听你说。";
-        if (moodValue < 60) return " 今天怎么样？什么都可以说。";
-        if (moodValue < 80) return " 心情不错呢！";
-        return " 今天精神很好呢！";
-      default: // Korean
-        if (moodValue < 20) return " 오늘 많이 힘드신 것 같아요. 편하게 이야기해 주세요.";
-        if (moodValue < 40) return " 오늘 좀 힘드셨군요. 편하게 이야기해 주세요.";
-        if (moodValue < 60) return " 오늘 어떠세요? 무슨 이야기든 해 주세요.";
-        if (moodValue < 80) return " 오늘 기분이 좋으시군요!";
-        return " 오늘 정말 좋으신 것 같아요!";
-    }
-  };
-
-  const getInitialMessage = () => {
-    if (!persona) return language === "Korean" ? "MindMate에 오신 것을 환영합니다" : "Welcome to MindMate";
-    const moodCtx = getMoodContext(mood);
-    switch (language) {
-      case "English":
-        return `Hello! I'm ${persona.name}.${moodCtx} Feel free to share what's on your mind.`;
-      case "Japanese":
-        return `こんにちは！私は${persona.name}です。${moodCtx} 何でも気軽に話しかけてください。`;
-      case "Chinese":
-        return `你好！我是${persona.name}。${moodCtx} 请随时告诉我您的想法。`;
-      default:
-        return `안녕하세요! 저는 ${persona.name}이에요.${moodCtx} 편하게 이야기해 주세요.`;
-    }
-  };
-
-  const [messages, setMessages] = useState<Message[]>(
-    existingThread?.messages ||
-      (persona ? [{ id: 1, text: getInitialMessage(), sender: "ai", timestamp: new Date() }] : [])
-  );
-  const [input, setInput]                   = useState("");
-  const [showPersonaEdit, setShowPersonaEdit] = useState(false);
-  const [showHistorySidebar, setShowHistorySidebar] = useState(false);
-  const [editedPersona, setEditedPersona]   = useState<Persona | undefined>(persona);
-  const [cnipValues, setCnipValues]         = useState<number[]>(() => persona?.cnipValues ?? Array(18).fill(0));
-  const [savedThreads, setSavedThreads]     = useState<Thread[]>([]);
-  const [threadId]                          = useState(existingThread?.id || Date.now().toString());
-  const [isLoadingResponse, setIsLoadingResponse] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  useEffect(() => { if (!persona) navigate("/"); }, [persona, navigate]);
-  useEffect(() => { scrollToBottom(); }, [messages]);
-
-  // 자동 저장
-  useEffect(() => {
-    if (messages.length > 1 && editedPersona) {
-      const thread: Thread = {
-        id: threadId,
-        persona: editedPersona,
-        messages,
-        mood,
-        language,
-        createdAt: existingThread?.createdAt || new Date(),
-        title: `${new Date().toLocaleDateString()} 대화`,
-        savedWithPersona: false,
-      };
-      const saved = localStorage.getItem("threads");
-      const threads = saved ? JSON.parse(saved) : [];
-      const idx = threads.findIndex((th: Thread) => th.id === threadId);
-      if (idx >= 0) threads[idx] = thread;
-      else threads.push(thread);
-      localStorage.setItem("threads", JSON.stringify(threads));
-    }
-  }, [messages, editedPersona]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("threads");
-    if (saved) {
-      const threads = JSON.parse(saved).map((th: Thread) => ({
-        ...th,
-        createdAt: new Date(th.createdAt),
-        messages: th.messages.map((m: Message) => ({ ...m, timestamp: new Date(m.timestamp) })),
-      }));
-      setSavedThreads(threads);
-    }
-  }, [persona]);
-
-  const handleCnipQ = (index: number, value: number) => {
-    const next = [...cnipValues];
-    next[index] = value;
-    setCnipValues(next);
-  };
-
-  const handleApplyPersonaChanges = () => {
-    if (!editedPersona) return;
-    const newScores = calcCnipScores(cnipValues);
-    const updated: Persona = {
-      ...editedPersona,
-      cnipScores: newScores,
-      cnipValues: [...cnipValues],
-      description: getCnipDescription(newScores),
+    const getMoodContext = (moodValue?: number) => {
+        if (moodValue === undefined) return "";
+        switch (language) {
+            case "English":
+                if (moodValue < 20)
+                    return " I can see you're having a tough day. Feel free to share.";
+                if (moodValue < 40)
+                    return " Sounds like things are a bit rough. I'm here to listen.";
+                if (moodValue < 60)
+                    return " How are you doing? Feel free to share anything.";
+                if (moodValue < 80) return " Glad you're feeling good!";
+                return " You seem to be in great spirits today!";
+            case "Japanese":
+                if (moodValue < 20)
+                    return " 今日はとても辛そうですね。気軽に話してください。";
+                if (moodValue < 40)
+                    return " 少し辛そうですね。聞かせてください。";
+                if (moodValue < 60)
+                    return " 今日はどうですか？何でも話してください。";
+                if (moodValue < 80) return " 気分が良さそうですね！";
+                return " 今日はとても元気そうですね！";
+            case "Chinese":
+                if (moodValue < 20) return " 今天看起来很难受。请随便说说吧。";
+                if (moodValue < 40) return " 听起来有点辛苦。我在这里听你说。";
+                if (moodValue < 60) return " 今天怎么样？什么都可以说。";
+                if (moodValue < 80) return " 心情不错呢！";
+                return " 今天精神很好呢！";
+            default: // Korean
+                if (moodValue < 20)
+                    return " 오늘 많이 힘드신 것 같아요. 편하게 이야기해 주세요.";
+                if (moodValue < 40)
+                    return " 오늘 좀 힘드셨군요. 편하게 이야기해 주세요.";
+                if (moodValue < 60)
+                    return " 오늘 어떠세요? 무슨 이야기든 해 주세요.";
+                if (moodValue < 80) return " 오늘 기분이 좋으시군요!";
+                return " 오늘 정말 좋으신 것 같아요!";
+        }
     };
-    setEditedPersona(updated);
-    const saved = localStorage.getItem("personas");
-    if (saved) {
-      const personas: Persona[] = JSON.parse(saved);
-      const i = personas.findIndex((p) => p.id === updated.id);
-      if (i >= 0) {
-        personas[i] = updated;
-        localStorage.setItem("personas", JSON.stringify(personas));
-      }
-    }
-    setShowPersonaEdit(false);
-  };
 
-  const handleThreadSelect = (thread: Thread) => {
-    setMessages(thread.messages);
-    setEditedPersona(thread.persona);
-    setCnipValues(thread.persona.cnipValues ?? Array(18).fill(0));
-    setShowHistorySidebar(false);
-  };
+    const getInitialMessage = () => {
+        if (!persona)
+            return language === "Korean"
+                ? "MindMate에 오신 것을 환영합니다"
+                : "Welcome to MindMate";
+        const moodCtx = getMoodContext(mood);
+        switch (language) {
+            case "English":
+                return `Hello! I'm ${persona.name}.${moodCtx} Feel free to share what's on your mind.`;
+            case "Japanese":
+                return `こんにちは！私は${persona.name}です。${moodCtx} 何でも気軽に話しかけてください。`;
+            case "Chinese":
+                return `你好！我是${persona.name}。${moodCtx} 请随时告诉我您的想法。`;
+            default:
+                return `안녕하세요! 저는 ${persona.name}이에요.${moodCtx} 편하게 이야기해 주세요.`;
+        }
+    };
 
-  const handleSend = async () => {
-    if (!input.trim() || !persona) return;
-    const userMessage: Message = { id: messages.length + 1, text: input, sender: "user", timestamp: new Date() };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    setInput("");
-    setIsLoadingResponse(true);
-    try {
-      if (!isGeminiInitialized()) throw new Error(
-        language === "Korean" ? "AI 서비스에 연결할 수 없어요. 설정을 확인해 주세요."
-        : language === "Japanese" ? "AIサービスに接続できません。設定を確認してください。"
-        : language === "Chinese" ? "无法连接AI服务。请检查设置。"
-        : "Cannot connect to AI service. Please check settings."
-      );
-      const aiResponseText = await sendMessageToGemini(
-        userMessage.text, editedPersona ?? persona, newMessages, mood, language
-      );
-      setMessages((prev) => [
-        ...prev,
-        { id: newMessages.length + 1, text: aiResponseText, sender: "ai", timestamp: new Date() },
-      ]);
-    } catch (error) {
-      const fallback = language === "Korean" ? "응답을 가져오지 못했어요. 다시 시도해 주세요."
-        : language === "Japanese" ? "応答を取得できませんでした。もう一度お試しください。"
-        : language === "Chinese" ? "获取响应失败，请重试。"
-        : "Failed to get a response. Please try again.";
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newMessages.length + 1,
-          text: error instanceof Error ? error.message : fallback,
-          sender: "ai",
-          timestamp: new Date(),
-        },
-      ]);
-    } finally {
-      setIsLoadingResponse(false);
-    }
-  };
+    const [messages, setMessages] = useState<Message[]>(
+        existingThread?.messages ||
+            (persona
+                ? [
+                      {
+                          id: 1,
+                          text: getInitialMessage(),
+                          sender: "ai",
+                          timestamp: new Date(),
+                      },
+                  ]
+                : [])
+    );
+    const [input, setInput] = useState("");
+    const [showPersonaEdit, setShowPersonaEdit] = useState(false);
+    const [showHistorySidebar, setShowHistorySidebar] = useState(false);
+    const [editedPersona, setEditedPersona] = useState<Persona | undefined>(
+        persona
+    );
+    const [cnipValues, setCnipValues] = useState<number[]>(
+        () => persona?.cnipValues ?? Array(18).fill(0)
+    );
+    const [savedThreads, setSavedThreads] = useState<Thread[]>([]);
+    const [threadId] = useState(existingThread?.id || Date.now().toString());
+    const [isLoadingResponse, setIsLoadingResponse] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  };
+    const scrollToBottom = () => {
+        const el = messagesEndRef.current?.parentElement;
+        if (el) el.scrollTop = el.scrollHeight;
+    };
 
-  if (!persona) return null;
+    useEffect(() => {
+        if (!persona) navigate("/");
+    }, [persona, navigate]);
+    useEffect(() => {
+        if (messages.length > 1) scrollToBottom();
+    }, [messages]);
 
-  const scores       = calcCnipScores(cnipValues);
-  const traitSummary = computeTraitSummary(scores, t);
-  const subtitle     = editedPersona?.cnipScores
-    ? computeSubtitle(editedPersona.cnipScores, t)
-    : t.aiCounselor;
+    // 자동 저장
+    useEffect(() => {
+        if (messages.length > 1 && editedPersona) {
+            const thread: Thread = {
+                id: threadId,
+                persona: editedPersona,
+                messages,
+                mood,
+                language,
+                createdAt: existingThread?.createdAt || new Date(),
+                title: `${new Date().toLocaleDateString()} 대화`,
+                savedWithPersona: false,
+            };
+            const saved = localStorage.getItem("threads");
+            const threads = saved ? JSON.parse(saved) : [];
+            const idx = threads.findIndex((th: Thread) => th.id === threadId);
+            if (idx >= 0) threads[idx] = thread;
+            else threads.push(thread);
+            localStorage.setItem("threads", JSON.stringify(threads));
+        }
+    }, [messages, editedPersona]);
 
-  return (
-    {/* ── 배경 레이어 ── */}
-    <div className="h-screen flex flex-col relative overflow-hidden">
+    useEffect(() => {
+        const saved = localStorage.getItem("threads");
+        if (saved) {
+            const threads = JSON.parse(saved).map((th: Thread) => ({
+                ...th,
+                createdAt: new Date(th.createdAt),
+                messages: th.messages.map((m: Message) => ({
+                    ...m,
+                    timestamp: new Date(m.timestamp),
+                })),
+            }));
+            setSavedThreads(threads);
+        }
+    }, [persona]);
 
-      {/* 배경: 깊이감 있는 그라디언트 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#daf2e7] via-[#c2e8d4] to-[#9dd4b8]" />
-      {/* 배경 장식 blob */}
-      <div className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none opacity-40"
-        style={{ background: "radial-gradient(circle, #a8e6c8 0%, transparent 70%)" }} />
-      <div className="absolute -bottom-40 -left-24 w-[420px] h-[420px] rounded-full blur-3xl pointer-events-none opacity-30"
-        style={{ background: "radial-gradient(circle, #5aab7d 0%, transparent 70%)" }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-3xl pointer-events-none opacity-10"
-        style={{ background: "radial-gradient(ellipse, #ffffff 0%, transparent 70%)" }} />
+    const handleCnipQ = (index: number, value: number) => {
+        const next = [...cnipValues];
+        next[index] = value;
+        setCnipValues(next);
+    };
 
-      {/* ── 헤더 ── */}
-      <div className="relative z-10 flex-shrink-0 flex items-center justify-between px-5 py-3.5
-                      bg-white/40 backdrop-blur-2xl border-b border-white/50
-                      shadow-[0_1px_24px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/")}
-            className="p-2 rounded-xl bg-white/50 hover:bg-white/80 border border-white/60 transition-all shadow-sm"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#355F4B]" />
-          </button>
-          <PersonaAvatar
-            persona={editedPersona ?? persona}
-            size={42}
-            ringClass="ring-2 ring-white/80 shadow-lg"
-          />
-          <div>
-            <h2 className="font-bold text-[#1a3d2b] text-base leading-tight tracking-tight">
-              {(editedPersona ?? persona).name}
-            </h2>
-            <p className="text-[11px] text-[#355F4B]/70 leading-tight mt-0.5">{subtitle}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowHistorySidebar(!showHistorySidebar)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
-                       bg-white/50 hover:bg-white/80 border border-white/60
-                       text-[#355F4B] text-xs font-semibold transition-all shadow-sm"
-          >
-            <History className="w-3.5 h-3.5" />
-            {t.history}
-          </button>
-          <button
-            onClick={() => setShowPersonaEdit(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
-                       bg-[#355F4B]/80 hover:bg-[#355F4B] backdrop-blur-sm
-                       text-white text-xs font-semibold transition-all shadow-sm hover:shadow-md"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            {t.adjustStyle}
-          </button>
-        </div>
-      </div>
+    const handleApplyPersonaChanges = () => {
+        if (!editedPersona) return;
+        const newScores = calcCnipScores(cnipValues);
+        const updated: Persona = {
+            ...editedPersona,
+            cnipScores: newScores,
+            cnipValues: [...cnipValues],
+            description: getCnipDescription(newScores),
+        };
+        setEditedPersona(updated);
+        const saved = localStorage.getItem("personas");
+        if (saved) {
+            const personas: Persona[] = JSON.parse(saved);
+            const i = personas.findIndex((p) => p.id === updated.id);
+            if (i >= 0) {
+                personas[i] = updated;
+                localStorage.setItem("personas", JSON.stringify(personas));
+            }
+        }
+        setShowPersonaEdit(false);
+    };
 
-      {/* ── C-NIP 다이얼로그 ── */}
-      {showPersonaEdit && editedPersona && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-             style={{ backdropFilter: "blur(16px)", background: "rgba(0,0,0,0.35)" }}>
-          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-8 max-w-2xl w-full
-                          shadow-[0_24px_80px_rgba(0,0,0,0.2)] border border-white/60
-                          max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800">{t.adjustStyle}</h3>
-              <button
-                onClick={() => { setShowPersonaEdit(false); setCnipValues(persona.cnipValues ?? Array(18).fill(0)); }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
+    const handleThreadSelect = (thread: Thread) => {
+        setMessages(thread.messages);
+        setEditedPersona(thread.persona);
+        setCnipValues(thread.persona.cnipValues ?? Array(18).fill(0));
+        setShowHistorySidebar(false);
+    };
 
-            {/* 성향 요약 */}
-            <div className="grid grid-cols-2 gap-2 mb-6">
-              {traitSummary.map((tr) => (
-                <div key={tr.dimLabel} className="bg-gray-50/80 rounded-2xl px-3 py-2.5 border border-gray-100">
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">{tr.dimLabel}</p>
-                  <p className={`text-sm font-bold mt-0.5 ${tr.color}`}>{tr.label}</p>
-                  <p className="text-xs text-gray-500 leading-tight mt-0.5">{tr.desc}</p>
-                </div>
-              ))}
-            </div>
+    const handleSend = async () => {
+        if (!input.trim() || !persona) return;
+        const userMessage: Message = {
+            id: messages.length + 1,
+            text: input,
+            sender: "user",
+            timestamp: new Date(),
+        };
+        const newMessages = [...messages, userMessage];
+        setMessages(newMessages);
+        setInput("");
+        setIsLoadingResponse(true);
+        try {
+            if (!isGeminiInitialized())
+                throw new Error(
+                    language === "Korean"
+                        ? "AI 서비스에 연결할 수 없어요. 설정을 확인해 주세요."
+                        : language === "Japanese"
+                        ? "AIサービスに接続できません。設定を確認してください。"
+                        : language === "Chinese"
+                        ? "无法连接AI服务。请检查设置。"
+                        : "Cannot connect to AI service. Please check settings."
+                );
+            const aiResponseText = await sendMessageToGemini(
+                userMessage.text,
+                editedPersona ?? persona,
+                newMessages,
+                mood,
+                language
+            );
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: newMessages.length + 1,
+                    text: aiResponseText,
+                    sender: "ai",
+                    timestamp: new Date(),
+                },
+            ]);
+        } catch (error) {
+            const fallback =
+                language === "Korean"
+                    ? "응답을 가져오지 못했어요. 다시 시도해 주세요."
+                    : language === "Japanese"
+                    ? "応答を取得できませんでした。もう一度お試しください。"
+                    : language === "Chinese"
+                    ? "获取响应失败，请重试。"
+                    : "Failed to get a response. Please try again.";
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: newMessages.length + 1,
+                    text: error instanceof Error ? error.message : fallback,
+                    sender: "ai",
+                    timestamp: new Date(),
+                },
+            ]);
+        } finally {
+            setIsLoadingResponse(false);
+        }
+    };
 
-            {/* 눈금 안내 */}
-            <div className="bg-[#CFF3E4]/50 rounded-2xl px-4 py-2.5 text-xs text-gray-500
-                            flex gap-5 flex-wrap justify-center mb-6 border border-[#CFF3E4]">
-              <span><strong className="text-[#355F4B]">-3</strong> {t.scaleLeft}</span>
-              <span><strong className="text-gray-400">0</strong> {t.scaleNeutral}</span>
-              <span><strong className="text-[#355F4B]">+3</strong> {t.scaleRight}</span>
-            </div>
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
 
-            {/* Q1–Q18 */}
-            <div className="space-y-5">
-              {t.questions.map((q, i) => (
-                <div key={i} className="space-y-1">
-                  <span className="inline-block bg-[#CFF3E4] text-[#355F4B] text-xs font-bold px-2 py-0.5 rounded-full">
-                    Q{i + 1}
-                  </span>
-                  <SevenCircleScale
-                    value={cnipValues[i]}
-                    onChange={(v) => handleCnipQ(i, v)}
-                    leftLabel={q.left}
-                    rightLabel={q.right}
-                  />
-                </div>
-              ))}
-            </div>
+    if (!persona) return null;
 
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={handleApplyPersonaChanges}
-                className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all"
-              >
-                {t.apply}
-              </button>
-              <button
-                onClick={() => { setShowPersonaEdit(false); setCnipValues(persona.cnipValues ?? Array(18).fill(0)); }}
-                className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
-              >
-                {t.cancel}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    const scores = calcCnipScores(cnipValues);
+    const traitSummary = computeTraitSummary(scores, t);
+    const subtitle = editedPersona?.cnipScores
+        ? computeSubtitle(editedPersona.cnipScores, t)
+        : t.aiCounselor;
 
-      {/* ── 기록 사이드바 ── */}
-      {showHistorySidebar && (
-        <>
-          {/* 딤 오버레이 */}
-          <div
-            className="fixed inset-0 z-30"
-            style={{ backdropFilter: "blur(4px)", background: "rgba(0,0,0,0.2)" }}
-            onClick={() => setShowHistorySidebar(false)}
-          />
-          <div className="fixed inset-y-0 right-0 w-80 z-40 flex flex-col
-                          bg-white/70 backdrop-blur-2xl border-l border-white/50
-                          shadow-[−8px_0_40px_rgba(0,0,0,0.12)]">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-white/40">
-              <h2 className="text-base font-bold text-[#1a3d2b]">{t.chatHistory}</h2>
-              <button
-                onClick={() => setShowHistorySidebar(false)}
-                className="p-1.5 hover:bg-white/60 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4 text-gray-500" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
-              {savedThreads.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-12">{t.noHistory}</p>
-              ) : (
-                savedThreads.map((thread) => (
-                  <button
-                    key={thread.id}
-                    onClick={() => handleThreadSelect(thread)}
-                    className={`w-full text-left p-3.5 rounded-2xl border transition-all ${
-                      thread.id === threadId
-                        ? "bg-[#355F4B]/10 border-[#6BCB9A]/60 shadow-sm"
-                        : "bg-white/40 border-white/50 hover:bg-white/70 hover:border-white/80"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <PersonaAvatar persona={thread.persona} size={30} className="flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-gray-800 truncate">{thread.persona.name}</div>
-                        <div className="text-[10px] text-gray-400">{t.messagesCount(thread.messages.length)}</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                      {thread.messages[thread.messages.length - 1]?.text}
-                    </p>
-                    <div className="text-[10px] text-gray-400 mt-1.5">
-                      {thread.createdAt.toLocaleDateString()}
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ── 메시지 영역 ── */}
-      <div className="relative z-0 flex-1 overflow-y-auto px-5 py-6 space-y-4">
-        {messages.map((message) => (
-          message.sender === "ai" ? (
-            <div key={message.id} className="flex items-end gap-2.5">
-              <PersonaAvatar
-                persona={editedPersona ?? persona}
-                size={34}
-                className="flex-shrink-0 shadow-md"
-                ringClass="ring-2 ring-white/70"
-              />
-              <div
-                className="max-w-[68%] rounded-2xl rounded-bl-sm px-4 py-3
-                            bg-white/70 backdrop-blur-sm border border-white/60
-                            shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                style={{ borderLeft: `3px solid ${(editedPersona ?? persona).color || "#6BCB9A"}` }}
-              >
-                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                <p className="text-[10px] text-gray-400 mt-1.5 text-right">
-                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div key={message.id} className="flex justify-end">
-              <div className="max-w-[68%] rounded-2xl rounded-br-sm px-4 py-3
-                              shadow-[0_4px_20px_rgba(53,95,75,0.25)]"
-                   style={{ background: "linear-gradient(135deg, #6BCB9A 0%, #2d5a3d 100%)" }}>
-                <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                <p className="text-[10px] text-white/50 mt-1.5 text-right">
-                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-            </div>
-          )
-        ))}
-
-        {/* 타이핑 인디케이터 */}
-        {isLoadingResponse && (
-          <div className="flex items-end gap-2.5">
-            <PersonaAvatar
-              persona={editedPersona ?? persona}
-              size={34}
-              className="flex-shrink-0 shadow-md"
-              ringClass="ring-2 ring-white/70"
+    return (
+        <div className="h-screen flex flex-col relative overflow-hidden">
+            {/* 배경: 깊이감 있는 그라디언트 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#daf2e7] via-[#c2e8d4] to-[#9dd4b8]" />
+            {/* 배경 장식 blob */}
+            <div
+                className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full blur-3xl pointer-events-none opacity-40"
+                style={{
+                    background:
+                        "radial-gradient(circle, #a8e6c8 0%, transparent 70%)",
+                }}
             />
             <div
-              className="rounded-2xl rounded-bl-sm px-4 py-3.5
+                className="absolute -bottom-40 -left-24 w-[420px] h-[420px] rounded-full blur-3xl pointer-events-none opacity-30"
+                style={{
+                    background:
+                        "radial-gradient(circle, #5aab7d 0%, transparent 70%)",
+                }}
+            />
+            <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-3xl pointer-events-none opacity-10"
+                style={{
+                    background:
+                        "radial-gradient(ellipse, #ffffff 0%, transparent 70%)",
+                }}
+            />
+
+            {/* ── 헤더 ── */}
+            <div
+                className="relative z-10 flex-shrink-0 flex items-center justify-between px-5 py-3.5
+                      bg-white/40 backdrop-blur-2xl border-b border-white/50
+                      shadow-[0_1px_24px_rgba(0,0,0,0.06)]"
+            >
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => navigate("/")}
+                        className="p-2 rounded-xl bg-white/50 hover:bg-white/80 border border-white/60 transition-all shadow-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4 text-[#6BCB9A]" />
+                    </button>
+                    <PersonaAvatar
+                        persona={editedPersona ?? persona}
+                        size={42}
+                        ringClass="ring-2 ring-white/80 shadow-lg"
+                    />
+                    <div>
+                        <h2 className="font-bold text-[#1a3d2b] text-base leading-tight tracking-tight">
+                            {(editedPersona ?? persona).name}
+                        </h2>
+                        <p className="text-[11px] text-[#6BCB9A]/70 leading-tight mt-0.5">
+                            {subtitle}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() =>
+                            setShowHistorySidebar(!showHistorySidebar)
+                        }
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                       bg-white/50 hover:bg-white/80 border border-white/60
+                       text-[#6BCB9A] text-xs font-semibold transition-all shadow-sm"
+                    >
+                        <History className="w-3.5 h-3.5" />
+                        {t.history}
+                    </button>
+                    <button
+                        onClick={() => setShowPersonaEdit(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                       bg-[#6BCB9A]/80 hover:bg-[#6BCB9A] backdrop-blur-sm
+                       text-white text-xs font-semibold transition-all shadow-sm hover:shadow-md"
+                    >
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                        {t.adjustStyle}
+                    </button>
+                </div>
+            </div>
+
+            {/* ── C-NIP 다이얼로그 ── */}
+            {showPersonaEdit && editedPersona && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{
+                        backdropFilter: "blur(16px)",
+                        background: "rgba(0,0,0,0.35)",
+                    }}
+                >
+                    <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full shadow-[0_24px_80px_rgba(0,0,0,0.2)] border border-white/60">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-xl font-bold text-gray-800">
+                                대화 스타일 조정
+                            </h3>
+                            <button
+                                onClick={() => {
+                                    setShowPersonaEdit(false);
+                                    setCnipValues(
+                                        persona.cnipValues ?? Array(18).fill(0)
+                                    );
+                                }}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5 text-gray-400" />
+                            </button>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-8">
+                            대화가 마음에 들지 않으셨나요? 아래에서 조금씩
+                            조정해보세요
+                        </p>
+
+                        <div className="space-y-8">
+                            {[
+                                {
+                                    label: "주도성",
+                                    left: "내가 이끌기",
+                                    right: "상담사가 이끌기",
+                                    idx: 0,
+                                },
+                                {
+                                    label: "감정 초점",
+                                    left: "생각 / 분석",
+                                    right: "감정 / 공감",
+                                    idx: 1,
+                                },
+                                {
+                                    label: "시간 지향",
+                                    left: "현재 / 미래",
+                                    right: "과거 / 경험",
+                                    idx: 2,
+                                },
+                                {
+                                    label: "피드백",
+                                    left: "공감 위주",
+                                    right: "직접적 피드백",
+                                    idx: 3,
+                                },
+                            ].map(({ label, left, right, idx }) => (
+                                <div key={label} className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-semibold text-gray-700">
+                                            {label}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs text-gray-400 w-20 text-right flex-shrink-0">
+                                            {left}
+                                        </span>
+                                        <input
+                                            type="range"
+                                            min={-3}
+                                            max={3}
+                                            step={1}
+                                            value={cnipValues[idx]}
+                                            onChange={(e) => {
+                                                const next = [...cnipValues];
+                                                next[idx] = Number(
+                                                    e.target.value
+                                                );
+                                                setCnipValues(next);
+                                            }}
+                                            className="flex-1 accent-[#6BCB9A]"
+                                        />
+                                        <span className="text-xs text-gray-400 w-20 flex-shrink-0">
+                                            {right}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-3 mt-10">
+                            <button
+                                onClick={handleApplyPersonaChanges}
+                                className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all"
+                            >
+                                적용하기
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowPersonaEdit(false);
+                                    setCnipValues(
+                                        persona.cnipValues ?? Array(18).fill(0)
+                                    );
+                                }}
+                                className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
+                            >
+                                취소
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── 기록 사이드바 ── */}
+            {showHistorySidebar && (
+                <>
+                    {/* 딤 오버레이 */}
+                    <div
+                        className="fixed inset-0 z-30"
+                        style={{
+                            backdropFilter: "blur(4px)",
+                            background: "rgba(0,0,0,0.2)",
+                        }}
+                        onClick={() => setShowHistorySidebar(false)}
+                    />
+                    <div
+                        className="fixed inset-y-0 right-0 w-80 z-40 flex flex-col
+                          bg-white/70 backdrop-blur-2xl border-l border-white/50
+                          shadow-[−8px_0_40px_rgba(0,0,0,0.12)]"
+                    >
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-white/40">
+                            <h2 className="text-base font-bold text-[#1a3d2b]">
+                                {t.chatHistory}
+                            </h2>
+                            <button
+                                onClick={() => setShowHistorySidebar(false)}
+                                className="p-1.5 hover:bg-white/60 rounded-lg transition-colors"
+                            >
+                                <X className="w-4 h-4 text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+                            {savedThreads.length === 0 ? (
+                                <p className="text-gray-400 text-sm text-center py-12">
+                                    {t.noHistory}
+                                </p>
+                            ) : (
+                                savedThreads.map((thread) => (
+                                    <button
+                                        key={thread.id}
+                                        onClick={() =>
+                                            handleThreadSelect(thread)
+                                        }
+                                        className={`w-full text-left p-3.5 rounded-2xl border transition-all ${
+                                            thread.id === threadId
+                                                ? "bg-[#6BCB9A]/10 border-[#6BCB9A]/60 shadow-sm"
+                                                : "bg-white/40 border-white/50 hover:bg-white/70 hover:border-white/80"
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2.5 mb-2">
+                                            <PersonaAvatar
+                                                persona={thread.persona}
+                                                size={30}
+                                                className="flex-shrink-0"
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-semibold text-sm text-gray-800 truncate">
+                                                    {thread.persona.name}
+                                                </div>
+                                                <div className="text-[10px] text-gray-400">
+                                                    {t.messagesCount(
+                                                        thread.messages.length
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                                            {
+                                                thread.messages[
+                                                    thread.messages.length - 1
+                                                ]?.text
+                                            }
+                                        </p>
+                                        <div className="text-[10px] text-gray-400 mt-1.5">
+                                            {thread.createdAt.toLocaleDateString()}
+                                        </div>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* ── 메시지 영역 ── */}
+            <div className="relative z-0 flex-1 overflow-y-auto px-5 py-6 space-y-4">
+                {messages.map((message) =>
+                    message.sender === "ai" ? (
+                        <div
+                            key={message.id}
+                            className="flex items-end gap-2.5"
+                        >
+                            <PersonaAvatar
+                                persona={editedPersona ?? persona}
+                                size={34}
+                                className="flex-shrink-0 shadow-md"
+                                ringClass="ring-2 ring-white/70"
+                            />
+                            <div
+                                className="max-w-[68%] rounded-2xl rounded-bl-sm px-4 py-3
+                            bg-white/70 backdrop-blur-sm border border-white/60
+                            shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+                                style={{
+                                    borderLeft: `3px solid ${
+                                        (editedPersona ?? persona).color ||
+                                        "#6BCB9A"
+                                    }`,
+                                }}
+                            >
+                                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                                    {message.text}
+                                </p>
+                                <p className="text-[10px] text-gray-400 mt-1.5 text-right">
+                                    {message.timestamp.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div key={message.id} className="flex justify-end">
+                            <div
+                                className="max-w-[68%] rounded-2xl rounded-br-sm px-4 py-3
+                              shadow-[0_4px_20px_rgba(53,95,75,0.25)]"
+                                style={{
+                                    background:
+                                        "linear-gradient(135deg, #6BCB9A 0%, #2d5a3d 100%)",
+                                }}
+                            >
+                                <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
+                                    {message.text}
+                                </p>
+                                <p className="text-[10px] text-white/50 mt-1.5 text-right">
+                                    {message.timestamp.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                    )
+                )}
+
+                {/* 타이핑 인디케이터 */}
+                {isLoadingResponse && (
+                    <div className="flex items-end gap-2.5">
+                        <PersonaAvatar
+                            persona={editedPersona ?? persona}
+                            size={34}
+                            className="flex-shrink-0 shadow-md"
+                            ringClass="ring-2 ring-white/70"
+                        />
+                        <div
+                            className="rounded-2xl rounded-bl-sm px-4 py-3.5
                           bg-white/70 backdrop-blur-sm border border-white/60
                           shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-              style={{ borderLeft: `3px solid ${(editedPersona ?? persona).color || "#6BCB9A"}` }}
-            >
-              <div className="flex items-center gap-1.5">
-                {[0, 160, 320].map((delay) => (
-                  <span
-                    key={delay}
-                    className="w-2 h-2 rounded-full animate-bounce"
-                    style={{
-                      animationDelay: `${delay}ms`,
-                      animationDuration: "1s",
-                      background: (editedPersona ?? persona).color || "#6BCB9A",
-                      opacity: 0.5,
-                    }}
-                  />
-                ))}
-              </div>
+                            style={{
+                                borderLeft: `3px solid ${
+                                    (editedPersona ?? persona).color ||
+                                    "#6BCB9A"
+                                }`,
+                            }}
+                        >
+                            <div className="flex items-center gap-1.5">
+                                {[0, 160, 320].map((delay) => (
+                                    <span
+                                        key={delay}
+                                        className="w-2 h-2 rounded-full animate-bounce"
+                                        style={{
+                                            animationDelay: `${delay}ms`,
+                                            animationDuration: "1s",
+                                            background:
+                                                (editedPersona ?? persona)
+                                                    .color || "#6BCB9A",
+                                            opacity: 0.5,
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div ref={messagesEndRef} />
             </div>
-          </div>
-        )}
 
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* ── 입력창 ── */}
-      <div className="relative z-10 flex-shrink-0 px-4 pb-5 pt-3
+            {/* ── 입력창 ── */}
+            <div
+                className="relative z-10 flex-shrink-0 px-4 pb-5 pt-3
                       bg-white/30 backdrop-blur-2xl border-t border-white/40
-                      shadow-[0_-8px_32px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center gap-2.5
+                      shadow-[0_-8px_32px_rgba(0,0,0,0.06)]"
+            >
+                <div
+                    className="flex items-center gap-2.5
                         bg-white/70 backdrop-blur-sm rounded-2xl
                         pl-5 pr-2 py-2.5
                         border border-white/70
                         shadow-[0_2px_16px_rgba(0,0,0,0.07)]
                         focus-within:border-[#6BCB9A]/60 focus-within:shadow-[0_2px_20px_rgba(107,203,154,0.2)]
-                        transition-all duration-200">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={t.typePlaceholder}
-            className="flex-1 bg-transparent focus:outline-none text-sm text-gray-800 placeholder:text-gray-400 py-0.5"
-            disabled={isLoadingResponse}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoadingResponse}
-            className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center
+                        transition-all duration-200"
+                >
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={t.typePlaceholder}
+                        className="flex-1 bg-transparent focus:outline-none text-sm text-gray-800 placeholder:text-gray-400 py-0.5"
+                        disabled={isLoadingResponse}
+                    />
+                    <button
+                        onClick={handleSend}
+                        disabled={!input.trim() || isLoadingResponse}
+                        className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center
                        bg-gradient-to-br from-[#6BCB9A] to-[#2d5a3d]
                        text-white shadow-md
                        hover:shadow-lg hover:scale-105
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100
                        transition-all duration-200"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+                    >
+                        <Send className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

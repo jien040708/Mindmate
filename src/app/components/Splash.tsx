@@ -2,38 +2,47 @@ import { Heart, AlertTriangle } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 export default function Splash() {
-  const { t } = useLanguage();
+    const { t } = useLanguage();
 
-  return (
-    <div className="h-screen w-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] flex flex-col items-center justify-center gap-8">
-      {/* 메인 로고 영역 */}
-      <div className="text-center space-y-6 animate-pulse">
-        <div className="flex justify-center mb-6">
-          <div className="bg-gradient-to-r from-[#6BCB9A] to-[#355F4B] p-8 rounded-full shadow-2xl">
-            <Heart className="w-20 h-20 text-white" />
-          </div>
-        </div>
-        <h1 className="text-6xl font-bold bg-gradient-to-r from-[#355F4B] to-[#6BCB9A] bg-clip-text text-transparent">
-          MindMate
-        </h1>
-        <p className="text-xl text-gray-600">{t.splashSub}</p>
-        <div className="flex justify-center pt-2">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-          </div>
-        </div>
-      </div>
+    return (
+        <div className="h-screen w-screen bg-gradient-to-br from-[#FAFFFC] via-[#CFF3E4] to-[#CFF3E4] flex flex-col items-center justify-center gap-8">
+            {/* 메인 로고 영역 */}
+            <div className="text-center space-y-6 animate-pulse">
+                <div className="flex justify-center mb-6">
+                    <div className="bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] p-8 rounded-full shadow-2xl">
+                        <Heart className="w-20 h-20 text-white" />
+                    </div>
+                </div>
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] bg-clip-text text-transparent">
+                    MindMate
+                </h1>
+                <p className="text-xl text-gray-600">{t.splashSub}</p>
+                <div className="flex justify-center pt-2">
+                    <div className="flex gap-2">
+                        <div
+                            className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce"
+                            style={{ animationDelay: "0ms" }}
+                        />
+                        <div
+                            className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce"
+                            style={{ animationDelay: "150ms" }}
+                        />
+                        <div
+                            className="w-3 h-3 bg-[#6BCB9A] rounded-full animate-bounce"
+                            style={{ animationDelay: "300ms" }}
+                        />
+                    </div>
+                </div>
+            </div>
 
-      {/* 안전 경고 배너 */}
-      <div className="max-w-md w-full mx-4 bg-yellow-50 border border-yellow-300 rounded-2xl p-4 flex gap-3 items-start shadow-sm">
-        <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-yellow-800 leading-relaxed">
-          <strong className="block mb-1">{t.safetyTitle}</strong>
-          {t.safetyBody}
+            {/* 안전 경고 배너 */}
+            <div className="max-w-md w-full mx-4 bg-yellow-50 border border-yellow-300 rounded-2xl p-4 flex gap-3 items-start shadow-sm">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-yellow-800 leading-relaxed">
+                    <strong className="block mb-1">{t.safetyTitle}</strong>
+                    {t.safetyBody}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
