@@ -31,7 +31,8 @@ export async function sendMessageToGemini(
         },
         body: JSON.stringify({
           message: userMessage,
-          persona,
+          // avatarDataUrl은 base64 이미지라 수 MB → 제거 후 전송
+          persona: { ...persona, avatarDataUrl: undefined },
           conversationHistory,
           mood,
           language,
