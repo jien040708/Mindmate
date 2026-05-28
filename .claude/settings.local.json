@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(anthropic-skills:pdf)",
+      "Skill(anthropic-skills:pdf:*)",
+      "Bash(ls \"C:\\\\Users\\\\jien0\\\\OneDrive\\\\바탕 화면\\\\26 봄\\\\[CS341]\\\\[CS341]ProgrammingAssignments\")",
+      "Bash(xargs cat)",
+      "Bash(ls \"C:\\\\Users\\\\jien0\\\\26S\\\\CS341_PA4\")",
+      "Bash(cmake -B build -S .)",
+      "Bash(which cmake3 *)",
+      "PowerShell(Get-Command cmake -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command cmake.exe -ErrorAction SilentlyContinue)"
+    ]
+  }
+}

@@ -18,7 +18,7 @@ app.use(
 );
 
 // Health check
-app.get("/make-server-c31a62f1/health", (c) => c.json({ status: "ok" }));
+app.get("/make-server-c31a62f1/health", (c) => c.json({ status: "ok", version: "v3-allErrors" }));
 
 // Debug
 app.get("/make-server-c31a62f1/debug", (c) => {
