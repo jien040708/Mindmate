@@ -277,7 +277,36 @@ export default function Chat() {
     const [savedThreads, setSavedThreads] = useState<Thread[]>([]);
     const [threadId] = useState(existingThread?.id || Date.now().toString());
     const [isLoadingResponse, setIsLoadingResponse] = useState(false);
+    const [showActionChips, setShowActionChips] = useState(false);
+    const [showBreakMessage, setShowBreakMessage] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const ACTION_CHIPS = [
+        "잠깐 산책하기 🚶",
+        "맛있는 음식 먹기 🍜",
+        "힐링 영화 보기 🎬",
+    ];
+    const CRISIS_KEYWORDS = [
+        "다 포기하고 싶어",
+        "포기하고 싶어",
+        "다 그만하고 싶어",
+        "사라지고 싶어",
+        "죽고 싶어",
+    ];
+    const TASK1_KEYWORDS = [
+        "너무 바빴어",
+        "너무 힘들었어",
+        "지쳤어",
+        "너무 피곤해",
+        "번아웃",
+        "힘들어",
+    ];
+    const CRISIS_RESPONSE =
+        "지금 정말 많이 버거운 상태인 것 같아. 혼자서 다 감당하려고 하지 않았으면 좋겠어. 혹시 오늘은 믿을 수 있는 사람이나 전문 상담사와도 이야기해볼래?";
+    const TASK1_RESPONSE =
+        "정말 많이 지쳤겠다. 오늘 하루 수고 많았어. 잠깐이라도 나 자신을 위한 시간을 가져보는 건 어때?";
+    const BREAK_MESSAGE =
+        "오늘 이야기 나누면서 많은 생각이 정리됐을 것 같아. 혹시 오늘 있었던 일을 일기로 한번 적어보는 건 어때? 글로 쓰다 보면 마음이 더 정리될 수 있거든. 다 적으면 나한테도 알려줘 😊";
 
     const scrollToBottom = () => {
         const el = messagesEndRef.current?.parentElement;
@@ -365,6 +394,7 @@ export default function Chat() {
 
     const handleSend = async () => {
         if (!input.trim() || !persona) return;
+        setShowActionChips(false);
         const userMessage: Message = {
             id: messages.length + 1,
             text: input,
@@ -386,22 +416,54 @@ export default function Chat() {
                         ? "无法连接AI服务。请检查设置。"
                         : "Cannot connect to AI service. Please check settings."
                 );
-            const aiResponseText = await sendMessageToGemini(
-                userMessage.text,
-                editedPersona ?? persona,
-                newMessages,
-                mood,
-                language
+            const isCrisis = CRISIS_KEYWORDS.some((k) =>
+                userMessage.text.includes(k)
             );
-            setMessages((prev) => [
-                ...prev,
+            const isTask1 = TASK1_KEYWORDS.some((k) =>
+                userMessage.text.includes(k)
+            );
+
+            let aiResponseText: string;
+            if (isCrisis) {
+                aiResponseText = CRISIS_RESPONSE;
+            } else if (isTask1) {
+                aiResponseText = TASK1_RESPONSE;
+                setShowActionChips(true);
+            } else {
+                aiResponseText = await sendMessageToGemini(
+                    userMessage.text,
+                    editedPersona ?? persona,
+                    newMessages,
+                    mood,
+                    language
+                );
+            }
+
+            const updatedMessages = [
+                ...newMessages,
                 {
                     id: newMessages.length + 1,
                     text: aiResponseText,
-                    sender: "ai",
+                    sender: "ai" as const,
                     timestamp: new Date(),
                 },
-            ]);
+            ];
+            setMessages(updatedMessages);
+
+            if (updatedMessages.length >= 20 && !showBreakMessage) {
+                setShowBreakMessage(true);
+                setTimeout(() => {
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            id: prev.length + 1,
+                            text: BREAK_MESSAGE,
+                            sender: "ai",
+                            timestamp: new Date(),
+                        },
+                    ]);
+                }, 1500);
+            }
         } catch (error) {
             const fallback =
                 language === "Korean"
@@ -812,7 +874,19 @@ export default function Chat() {
                         </div>
                     </div>
                 )}
-
+                {showActionChips && (
+                    <div className="flex gap-2 flex-wrap pl-10">
+                        {ACTION_CHIPS.map((chip) => (
+                            <button
+                                key={chip}
+                                onClick={() => setShowActionChips(false)}
+                                className="px-4 py-2 rounded-full text-sm font-medium bg-white/80 border border-[#6BCB9A]/40 text-[#355F4B] hover:bg-[#CFF3E4] hover:border-[#6BCB9A] transition-all shadow-sm"
+                            >
+                                {chip}
+                            </button>
+                        ))}
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
