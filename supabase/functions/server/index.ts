@@ -221,16 +221,16 @@ ${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}`;
 
     // Try Gemini API configurations
     const apiConfigs = [
+      { version: "v1beta", model: "gemini-2.5-flash-preview-05-20" },
       { version: "v1beta", model: "gemini-2.5-flash" },
-      { version: "v1", model: "gemini-2.5-flash" },
+      { version: "v1beta", model: "gemini-2.0-flash" },
       { version: "v1beta", model: "gemini-1.5-flash" },
       { version: "v1", model: "gemini-1.5-flash" },
-      { version: "v1beta", model: "gemini-pro" },
-      { version: "v1", model: "gemini-pro" },
+      { version: "v1beta", model: "gemini-1.5-flash-latest" },
     ];
 
     let geminiResponse;
-    let lastError;
+    const allErrors: object[] = [];
 
     for (const config of apiConfigs) {
       try {
@@ -255,15 +255,16 @@ ${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}`;
         }
         const errorText = await geminiResponse.text();
         console.log(`✗ Failed ${config.version}/${config.model}: ${errorText}`);
-        lastError = { status: geminiResponse.status, text: errorText, config };
+        allErrors.push({ status: geminiResponse.status, text: errorText, config });
+        geminiResponse = undefined;
       } catch (err) {
         console.log(`✗ Exception ${config.version}/${config.model}: ${err.message}`);
-        lastError = { error: err.message, config };
+        allErrors.push({ error: err.message, config });
       }
     }
 
     if (!geminiResponse || !geminiResponse.ok) {
-      return c.json({ error: "All Gemini API configurations failed", lastError }, 500);
+      return c.json({ error: "All Gemini API configurations failed", allErrors }, 500);
     }
 
     const data = await geminiResponse.json();
