@@ -226,7 +226,7 @@ export default function Chat() {
                 if (moodValue < 20)
                     return " 오늘 많이 힘드신 것 같아요.";
                 if (moodValue < 40)
-                    return " 오늘 좀 힘드셨군요. 편하게 이야기 해주세요.";
+                    return " 오늘 좀 힘드셨군요.";
                 if (moodValue < 60)
                     return " 오늘 어떠세요? 무슨 이야기든 해 주세요.";
                 if (moodValue < 80) return " 오늘 기분이 좋으시군요!";
