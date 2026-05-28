@@ -230,7 +230,7 @@ export default function Chat() {
                 if (moodValue < 60)
                     return " 오늘 어떠세요? 무슨 이야기든 해 주세요.";
                 if (moodValue < 80) return " 오늘 기분이 좋으시군요!";
-                return " 오늘 정말 좋으신 것 같아요!";
+                return " 오늘 기분이 정말 좋으신 것 같아요!";
         }
     };
 
