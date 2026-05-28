@@ -433,7 +433,7 @@ export default function Chat() {
                 aiResponseText = await sendMessageToGemini(
                     userMessage.text,
                     editedPersona ?? persona,
-                    newMessages,
+                    messages,
                     mood,
                     language
                 );
