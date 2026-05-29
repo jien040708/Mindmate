@@ -465,6 +465,7 @@ export default function Chat() {
                 }, 1500);
             }
         } catch (error) {
+            console.error("AI response error:", error);
             const fallback =
                 language === "Korean"
                     ? "응답을 가져오지 못했어요. 다시 시도해 주세요."
@@ -477,7 +478,7 @@ export default function Chat() {
                 ...prev,
                 {
                     id: newMessages.length + 1,
-                    text: error instanceof Error ? error.message : fallback,
+                    text: fallback,
                     sender: "ai",
                     timestamp: new Date(),
                 },
