@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Send, ArrowLeft, History, X, SlidersHorizontal } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { Thread, Message } from "../types/thread";
-import { sendMessageToGemini, isGeminiInitialized } from "../services/gemini";
+import { sendMessageToGemini, isGeminiInitialized, generateActionChips } from "../services/gemini";
 import { calcCnipScores, getCnipDescription } from "./PersonaSetting";
 import { useLanguage } from "../contexts/LanguageContext";
 import { T } from "../i18n/translations";
@@ -293,16 +293,18 @@ export default function Chat() {
     const [threadId] = useState(existingThread?.id || Date.now().toString());
     const [isLoadingResponse, setIsLoadingResponse] = useState(false);
     const [showActionChips, setShowActionChips] = useState(false);
+    const [dynamicChips, setDynamicChips] = useState<string[]>([]);
     const [showBreakMessage, setShowBreakMessage] = useState(false);
     const [showCounselorCard, setShowCounselorCard] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // 기분에 따라 액션 칩 선택
-    const ACTION_CHIPS = mood !== undefined
+    // Gemini가 생성한 칩이 있으면 우선 사용, 없으면 기분 기반 fallback
+    const fallbackChips = mood !== undefined
         ? mood < 40 ? t.actionChipsLow
         : mood < 70 ? t.actionChipsMid
         : t.actionChipsHigh
         : t.actionChips;
+    const ACTION_CHIPS = dynamicChips.length > 0 ? dynamicChips : fallbackChips;
     // 언어 설정과 무관하게 모든 언어 키워드를 항상 감지
     const CRISIS_KEYWORDS = [
         // 한국어
@@ -448,7 +450,12 @@ export default function Chat() {
                 setShowCounselorCard(true);
             } else if (isTask1) {
                 aiResponseText = TASK1_RESPONSE;
+                setDynamicChips([]);   // 이전 칩 초기화
                 setShowActionChips(true);
+                // 백그라운드에서 Gemini가 contextual 칩 생성 (완료되면 교체)
+                generateActionChips(userMessage.text, editedPersona ?? persona, mood, language)
+                    .then(chips => { if (chips.length > 0) setDynamicChips(chips); })
+                    .catch(() => {});
             } else {
                 aiResponseText = await sendMessageToGemini(
                     userMessage.text,

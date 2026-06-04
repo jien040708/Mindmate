@@ -60,3 +60,34 @@ export async function sendMessageToGemini(
     throw new Error('Failed to get response from AI. Please try again.');
   }
 }
+
+export async function generateActionChips(
+  message: string,
+  persona: Persona,
+  mood?: number,
+  language?: string
+): Promise<string[]> {
+  try {
+    const response = await fetch(
+      `https://${projectId}.supabase.co/functions/v1/make-server-c31a62f1/chips`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${publicAnonKey}`,
+        },
+        body: JSON.stringify({
+          message,
+          persona: { ...persona, avatarDataUrl: undefined },
+          mood,
+          language,
+        }),
+      }
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data.chips) ? data.chips : [];
+  } catch {
+    return [];
+  }
+}
