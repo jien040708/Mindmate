@@ -389,13 +389,13 @@ export default function Home() {
                             </p>
 
                             {/* 아바타 (중앙) */}
-                            <div className="flex-shrink-0 flex justify-center">
+                            <div className="flex-1 min-h-0 flex justify-center">
                                 {(() => {
                                     const found = CHARACTER_OPTIONS.find(
                                         (c) => c.id === selected.icon
                                     );
                                     return found ? (
-                                        <div className="h-40 aspect-[3/4] rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
+                                        <div className="h-full aspect-[3/4] rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
                                             <img
                                                 src={found.src}
                                                 alt={selected.name}
@@ -405,7 +405,7 @@ export default function Home() {
                                     ) : (
                                         <PersonaAvatar
                                             persona={selected}
-                                            size={80}
+                                            size={96}
                                             ringClass="ring-4 ring-white shadow-2xl"
                                         />
                                     );
@@ -414,20 +414,17 @@ export default function Home() {
 
                             {/* C-NIP 성향 카드 (2×2 그리드) */}
                             {traitCards && (
-                                <div className="flex-1 min-h-0 grid grid-cols-2 gap-2">
+                                <div className="flex-shrink-0 grid grid-cols-2 gap-1.5">
                                     {traitCards.map((card) => (
                                         <div
                                             key={card.dimLabel}
-                                            className={`${card.bg} rounded-2xl p-2.5 flex flex-col justify-center`}
+                                            className={`${card.bg} rounded-xl px-2.5 py-1.5 flex flex-col`}
                                         >
-                                            <p className="text-xs text-gray-400 font-medium mb-0.5">
+                                            <p className="text-[10px] text-gray-400 font-medium leading-tight">
                                                 {card.dimLabel}
                                             </p>
-                                            <p className={`text-sm font-bold ${card.color} leading-tight`}>
+                                            <p className={`text-xs font-bold ${card.color} leading-tight`}>
                                                 {card.label}
-                                            </p>
-                                            <p className="text-xs text-gray-500 leading-snug mt-1">
-                                                {card.desc}
                                             </p>
                                         </div>
                                     ))}
