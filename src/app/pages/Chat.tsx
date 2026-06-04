@@ -281,32 +281,12 @@ export default function Chat() {
     const [showBreakMessage, setShowBreakMessage] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const ACTION_CHIPS = [
-        "잠깐 산책하기 🚶",
-        "맛있는 음식 먹기 🍜",
-        "힐링 영화 보기 🎬",
-    ];
-    const CRISIS_KEYWORDS = [
-        "다 포기하고 싶어",
-        "포기하고 싶어",
-        "다 그만하고 싶어",
-        "사라지고 싶어",
-        "죽고 싶어",
-    ];
-    const TASK1_KEYWORDS = [
-        "너무 바빴어",
-        "너무 힘들었어",
-        "지쳤어",
-        "너무 피곤해",
-        "번아웃",
-        "힘들어",
-    ];
-    const CRISIS_RESPONSE =
-        "지금 정말 많이 버거운 상태인 것 같아. 혼자서 다 감당하려고 하지 않았으면 좋겠어. 혹시 오늘은 믿을 수 있는 사람이나 전문 상담사와도 이야기해볼래?";
-    const TASK1_RESPONSE =
-        "정말 많이 지쳤겠다. 오늘 하루 수고 많았어. 잠깐이라도 나 자신을 위한 시간을 가져보는 건 어때?";
-    const BREAK_MESSAGE =
-        "오늘 이야기 나누면서 많은 생각이 정리됐을 것 같아. 혹시 오늘 있었던 일을 일기로 한번 적어보는 건 어때? 글로 쓰다 보면 마음이 더 정리될 수 있거든. 다 적으면 나한테도 알려줘 😊";
+    const ACTION_CHIPS = t.actionChips;
+    const CRISIS_KEYWORDS = t.crisisKeywords;
+    const TASK1_KEYWORDS = t.task1Keywords;
+    const CRISIS_RESPONSE = t.crisisResponse;
+    const TASK1_RESPONSE = t.task1Response;
+    const BREAK_MESSAGE = t.breakMessage;
 
     const scrollToBottom = () => {
         const el = messagesEndRef.current?.parentElement;
@@ -593,7 +573,7 @@ export default function Chat() {
                     <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full shadow-[0_24px_80px_rgba(0,0,0,0.2)] border border-white/60">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-xl font-bold text-gray-800">
-                                대화 스타일 조정
+                                {t.adjustStyle}
                             </h3>
                             <button
                                 onClick={() => {
@@ -608,34 +588,33 @@ export default function Chat() {
                             </button>
                         </div>
                         <p className="text-sm text-gray-400 mb-8">
-                            대화가 마음에 들지 않으셨나요? 아래에서 조금씩
-                            조정해보세요
+                            {t.adjustStyleSubtitle}
                         </p>
 
                         <div className="space-y-8">
                             {[
                                 {
-                                    label: "주도성",
-                                    left: "내가 이끌기",
-                                    right: "상담사가 이끌기",
+                                    label: t.directiveness,
+                                    left: t.chatAdjustClientLead,
+                                    right: t.chatAdjustCounselorLead,
                                     idx: 0,
                                 },
                                 {
-                                    label: "감정 초점",
-                                    left: "생각 / 분석",
-                                    right: "감정 / 공감",
+                                    label: t.emotionFocus,
+                                    left: t.chatAdjustLogic,
+                                    right: t.chatAdjustEmotion,
                                     idx: 1,
                                 },
                                 {
-                                    label: "시간 지향",
-                                    left: "현재 / 미래",
-                                    right: "과거 / 경험",
+                                    label: t.timeOrientation,
+                                    left: t.chatAdjustPresent,
+                                    right: t.chatAdjustPast,
                                     idx: 2,
                                 },
                                 {
-                                    label: "피드백",
-                                    left: "공감 위주",
-                                    right: "직접적 피드백",
+                                    label: t.feedbackStyle,
+                                    left: t.chatAdjustEmpathy,
+                                    right: t.chatAdjustDirect,
                                     idx: 3,
                                 },
                             ].map(({ label, left, right, idx }) => (
@@ -677,7 +656,7 @@ export default function Chat() {
                                 onClick={handleApplyPersonaChanges}
                                 className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all"
                             >
-                                적용하기
+                                {t.apply}
                             </button>
                             <button
                                 onClick={() => {
@@ -688,7 +667,7 @@ export default function Chat() {
                                 }}
                                 className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
                             >
-                                취소
+                                {t.cancel}
                             </button>
                         </div>
                     </div>
