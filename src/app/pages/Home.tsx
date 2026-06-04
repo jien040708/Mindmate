@@ -414,18 +414,18 @@ export default function Home() {
 
                             {/* C-NIP 성향 카드 (2×2 그리드) */}
                             {traitCards && (
-                                <div className="flex-shrink-0 grid grid-cols-2 gap-1.5">
+                                <div className="flex-shrink-0 grid grid-cols-2 gap-1">
                                     {traitCards.map((card) => (
                                         <div
                                             key={card.dimLabel}
-                                            className={`${card.bg} rounded-xl px-2.5 py-1.5 flex flex-col`}
+                                            className={`${card.bg} rounded-lg px-2 py-1 flex items-center gap-1.5`}
                                         >
-                                            <p className="text-[10px] text-gray-400 font-medium leading-tight">
+                                            <span className="text-[9px] text-gray-400 font-medium whitespace-nowrap">
                                                 {card.dimLabel}
-                                            </p>
-                                            <p className={`text-xs font-bold ${card.color} leading-tight`}>
+                                            </span>
+                                            <span className={`text-[10px] font-bold ${card.color} whitespace-nowrap`}>
                                                 {card.label}
-                                            </p>
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
