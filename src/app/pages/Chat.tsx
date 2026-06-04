@@ -275,15 +275,15 @@ export default function Chat() {
         () => persona?.cnipValues ?? Array(18).fill(0)
     );
 
-    // 채팅 중 수정 다이얼로그용 슬라이더 — cnipScores를 -3..3 스케일로 변환
+    // 채팅 중 수정 다이얼로그용 슬라이더 — 페르소나 설명 레이블과 1:1 대응
+    // 각 차원의 임계값 기준으로 3구간(-3 / 0 / +3)에 배치
     const scoresToSliders = (s?: { td: number; ei: number; pao: number; ws: number }) => {
         if (!s) return [0, 0, 0, 0];
-        const cl = (v: number) => Math.max(-3, Math.min(3, v));
         return [
-            cl(Math.round(s.td  / 5)),
-            cl(Math.round(s.ei  / 5)),
-            cl(Math.round(s.pao / 3)),
-            cl(Math.round(s.ws  / 5)),
+            s.td  >= 8  ? 3 : s.td  <= -3 ? -3 : 0,  // TD: AI주도 / 균형 / 내담자주도
+            s.ei  >= 7  ? 3 : s.ei  <= -1 ? -3 : 0,  // EI: 감정집중 / 균형 / 이성논리
+            s.pao >= 3  ? 3 : s.pao <= -3 ? -3 : 0,  // PAO: 과거 / 균형 / 현재미래
+            s.ws  >= 4  ? 3 : s.ws  <= -4 ? -3 : 0,  // WS: 따뜻한지지 / 균형 / 직면도전
         ];
     };
     const [chatSliders, setChatSliders] = useState<number[]>(
