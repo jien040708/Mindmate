@@ -891,24 +891,39 @@ export default function Chat() {
                 )}
                 {showCounselorCard && (
                     <div className="ml-11 mr-2">
-                        <div className="bg-white/80 backdrop-blur-sm border border-[#6BCB9A]/30 rounded-2xl p-4 shadow-md">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-sm font-bold text-[#1a3d2b]">{t.counselorCardTitle}</p>
-                                <button onClick={() => setShowCounselorCard(false)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+                        <div className="bg-white/90 backdrop-blur-sm border border-red-100 rounded-2xl p-4 shadow-lg">
+                            {/* 헤더 */}
+                            <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">🆘</span>
+                                    <p className="text-sm font-bold text-red-600">{t.counselorCardTitle}</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowCounselorCard(false)}
+                                    className="text-gray-300 hover:text-gray-500 transition-colors text-base leading-none"
+                                >✕</button>
                             </div>
-                            <p className="text-xs text-gray-500 mb-3">{t.counselorCardDesc}</p>
-                            <div className="space-y-2">
+                            <p className="text-xs text-gray-400 mb-3 ml-7">{t.counselorCardDesc}</p>
+
+                            {/* 상담사 카드 그리드 */}
+                            <div className="grid grid-cols-3 gap-2">
                                 {t.counselors.map((c) => (
-                                    <div key={c.phone} className="flex items-center justify-between bg-[#CFF3E4]/40 rounded-xl px-3 py-2">
-                                        <div>
-                                            <p className="text-xs font-semibold text-gray-700">{c.name}</p>
-                                            <p className="text-[10px] text-gray-400">{c.hours}</p>
+                                    <div
+                                        key={c.phone}
+                                        className="flex flex-col items-center bg-red-50 border border-red-100 rounded-2xl px-3 py-3 gap-2"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-lg flex-shrink-0">
+                                            📞
+                                        </div>
+                                        <div className="text-center flex-1">
+                                            <p className="text-[11px] font-bold text-gray-700 leading-tight">{c.name}</p>
+                                            <p className="text-[10px] text-gray-400 mt-0.5">{c.hours}</p>
                                         </div>
                                         <a
                                             href={`tel:${c.phone}`}
-                                            className="flex items-center gap-1 px-3 py-1.5 bg-[#6BCB9A] text-white text-xs font-bold rounded-full hover:bg-[#5ab88a] transition-all"
+                                            className="w-full flex items-center justify-center gap-1 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                                         >
-                                            📞 {c.phone}
+                                            {t.counselorCallBtn} {c.phone}
                                         </a>
                                     </div>
                                 ))}
