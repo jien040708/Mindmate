@@ -11,6 +11,7 @@ export const translations = {
         delete: "삭제",
         cancel: "취소",
         apply: "적용하기",
+        duplicate: "복제",
         required: "*",
 
         // 홈
@@ -99,6 +100,17 @@ export const translations = {
         chatAdjustEmpathy: "공감 위주",
         chatAdjustDirect: "직접적 피드백",
         actionChips: ["잠깐 산책하기 🚶", "맛있는 음식 먹기 🍜", "힐링 영화 보기 🎬"],
+        actionChipsLow: ["따뜻한 차 한 잔 마시기 ☕", "좋아하는 음악 듣기 🎵", "잠깐 밖에 나가기 🌿"],
+        actionChipsMid: ["짧은 스트레칭 하기 🧘", "맛있는 음식 먹기 🍜", "좋아하는 영상 보기 📺"],
+        actionChipsHigh: ["친구에게 연락하기 📱", "새로운 것 해보기 ✨", "운동하러 나가기 🏃"],
+        counselorCardTitle: "전문 상담사와 연결하기",
+        counselorCardDesc: "지금 힘드시다면 전문가의 도움을 받아보세요",
+        counselorCallBtn: "전화하기",
+        counselors: [
+            { name: "자살예방상담전화", phone: "1393", hours: "24시간" },
+            { name: "정신건강위기상담전화", phone: "1577-0199", hours: "24시간" },
+            { name: "한국생명의전화", phone: "1588-9191", hours: "24시간" },
+        ],
         crisisKeywords: ["다 포기하고 싶어", "포기하고 싶어", "다 그만하고 싶어", "사라지고 싶어", "죽고 싶어"],
         task1Keywords: ["너무 바빴어", "너무 힘들었어", "지쳤어", "너무 피곤해", "번아웃", "힘들어"],
         crisisResponse: "지금 정말 많이 버거운 상태인 것 같아. 혼자서 다 감당하려고 하지 않았으면 좋겠어. 혹시 오늘은 믿을 수 있는 사람이나 전문 상담사와도 이야기해볼래?",
@@ -144,8 +156,8 @@ export const translations = {
                 right: "굳이 힘들고 불편한 감정을 들추지 않기",
             },
             {
-                left: "AI와 나 사이의 상담 관계나 호흡에 대해 이야기하기",
-                right: "AI와의 상담 관계 자체에 대해서는 이야기하지 않기",
+                left: "AI와의 상호작용 방식이나 대화 스타일에 대해 이야기하기",
+                right: "AI와의 상호작용 방식이나 대화 스타일에 대해서는 이야기하지 않기",
             },
             {
                 left: "상담 과정에서 나와 AI의 상호작용에 집중하기",
@@ -160,16 +172,16 @@ export const translations = {
                 right: "내 '생각과 논리'를 중심으로 다루기",
             },
             {
-                left: "과거의 내 삶과 경험에 집중하기",
-                right: "현재의 내 삶과 상황에 집중하기",
+                left: "과거의 경험이 현재의 나에게 미친 영향을 살펴보기",
+                right: "현재 겪고 있는 문제나 상황 자체에 집중하기",
             },
             {
-                left: "어린 시절의 기억과 경험 돌아보기",
-                right: "성인이 된 이후의 삶에 초점 맞추기",
+                left: "어린 시절과 성장 과정의 경험을 돌아보기",
+                right: "최근 또는 성인 이후의 경험을 중심으로 이야기하기",
             },
             {
-                left: "지나온 나의 과거에 집중하기",
-                right: "앞으로 다가올 미래에 집중하기",
+                left: "과거의 경험과 사건을 이해하는 데 집중하기",
+                right: "앞으로의 계획이나 변화 방향을 탐색하는 데 집중하기",
             },
             {
                 left: "부드럽고 온화하게 다가오기",
@@ -180,8 +192,8 @@ export const translations = {
                 right: "내 생각의 모순이나 문제점을 지적하기",
             },
             {
-                left: "대화 중간에 내 말을 끊지 않고 끝까지 듣기",
-                right: "주제를 벗어나면 말을 끊어서라도 초점 잡아주기",
+                left: "내가 충분히 말할 수 있도록 끝까지 들어주기",
+                right: "주제에서 벗어나면 핵심으로 돌아올 수 있도록 중간에 개입하기",
             },
             {
                 left: "내 가치관이나 신념에 의문 제기하지 않기",
@@ -203,6 +215,7 @@ export const translations = {
         delete: "Delete",
         cancel: "Cancel",
         apply: "Apply",
+        duplicate: "Duplicate",
         required: "*",
 
         counselorList: "Counselors",
@@ -294,6 +307,17 @@ export const translations = {
         chatAdjustEmpathy: "Empathy-focused",
         chatAdjustDirect: "Direct Feedback",
         actionChips: ["Take a short walk 🚶", "Have a good meal 🍜", "Watch a comforting movie 🎬"],
+        actionChipsLow: ["Have a warm drink ☕", "Listen to your favorite music 🎵", "Step outside for a moment 🌿"],
+        actionChipsMid: ["Do a short stretch 🧘", "Have something delicious 🍜", "Watch something you enjoy 📺"],
+        actionChipsHigh: ["Reach out to a friend 📱", "Try something new ✨", "Go for a workout 🏃"],
+        counselorCardTitle: "Connect with a counselor",
+        counselorCardDesc: "If you're struggling, professional help is available",
+        counselorCallBtn: "Call",
+        counselors: [
+            { name: "Crisis Text Line", phone: "741741", hours: "24/7 — text HOME" },
+            { name: "988 Suicide & Crisis Lifeline", phone: "988", hours: "24/7" },
+            { name: "SAMHSA Helpline", phone: "1-800-662-4357", hours: "24/7" },
+        ],
         crisisKeywords: ["want to give up", "want to disappear", "want to die", "can't go on", "no reason to live"],
         task1Keywords: ["too busy", "exhausted", "burned out", "so tired", "burnout", "drained"],
         crisisResponse: "It sounds like you're carrying a really heavy load right now. You don't have to face this alone. Would you consider talking to someone you trust, or a professional counselor today?",
@@ -331,8 +355,8 @@ export const translations = {
                 right: "Don't push into difficult emotions",
             },
             {
-                left: "Discuss our counseling relationship",
-                right: "Focus on issues, not relationship",
+                left: "Talk about how I interact and communicate with the AI",
+                right: "Avoid talking about how I interact and communicate with the AI",
             },
             {
                 left: "Focus on our interaction",
@@ -347,22 +371,25 @@ export const translations = {
                 right: "Focus mainly on thoughts/logic",
             },
             {
-                left: "Focus on my past life",
-                right: "Focus on my present life",
+                left: "Explore how past experiences have influenced who I am today",
+                right: "Focus on my current problems and present situation",
             },
             {
-                left: "Reflect on my childhood",
-                right: "Reflect on my adult life",
+                left: "Reflect on childhood and developmental experiences",
+                right: "Focus mainly on recent experiences or life since adulthood",
             },
-            { left: "Focus on my past", right: "Focus on my future" },
+            {
+                left: "Focus on understanding past experiences and events",
+                right: "Focus on exploring future plans and directions for change",
+            },
             { left: "Be gentle and warm", right: "Be challenging and direct" },
             {
                 left: "Support my perspective unconditionally",
                 right: "Point out flaws in my thinking",
             },
             {
-                left: "Listen without interrupting",
-                right: "Interrupt to keep me on track",
+                left: "Let me finish expressing my thoughts before responding",
+                right: "Step in and redirect the conversation when I stray too far from the main topic",
             },
             {
                 left: "Don't challenge my beliefs",
@@ -384,6 +411,7 @@ export const translations = {
         delete: "削除",
         cancel: "キャンセル",
         apply: "適用",
+        duplicate: "複製",
         required: "*",
 
         counselorList: "カウンセラー",
@@ -474,6 +502,17 @@ export const translations = {
         chatAdjustEmpathy: "共感重視",
         chatAdjustDirect: "直接的なフィードバック",
         actionChips: ["少し散歩する 🚶", "美味しいものを食べる 🍜", "癒しの映画を見る 🎬"],
+        actionChipsLow: ["温かいお茶を飲む ☕", "好きな音楽を聴く 🎵", "少し外に出る 🌿"],
+        actionChipsMid: ["軽くストレッチする 🧘", "美味しいものを食べる 🍜", "好きな動画を見る 📺"],
+        actionChipsHigh: ["友達に連絡する 📱", "新しいことに挑戦する ✨", "運動に行く 🏃"],
+        counselorCardTitle: "専門家に相談する",
+        counselorCardDesc: "辛いときは、専門家のサポートを受けてみてください",
+        counselorCallBtn: "電話する",
+        counselors: [
+            { name: "こころの健康相談統一ダイヤル", phone: "0570-064-556", hours: "平日" },
+            { name: "よりそいホットライン", phone: "0120-279-338", hours: "24時間" },
+            { name: "いのちの電話", phone: "0120-783-556", hours: "16:00〜21:00" },
+        ],
         crisisKeywords: ["포기하고 싶어", "消えたい", "死にたい"],
         task1Keywords: ["疲れた", "バーンアウト", "くたくた", "힘들어"],
         crisisResponse: "今、本当につらい状況にいるんですね。一人で抱え込まないでください。今日は信頼できる人や専門家に話してみませんか？",
@@ -531,6 +570,7 @@ export const translations = {
         delete: "删除",
         cancel: "取消",
         apply: "应用",
+        duplicate: "复制",
         required: "*",
 
         counselorList: "咨询师列表",
@@ -621,6 +661,17 @@ export const translations = {
         chatAdjustEmpathy: "共情为主",
         chatAdjustDirect: "直接反馈",
         actionChips: ["散步一会儿 🚶", "吃点好东西 🍜", "看部治愈电影 🎬"],
+        actionChipsLow: ["喝杯热茶 ☕", "听喜欢的音乐 🎵", "出去走走 🌿"],
+        actionChipsMid: ["做个简单拉伸 🧘", "吃点好东西 🍜", "看喜欢的视频 📺"],
+        actionChipsHigh: ["联系朋友 📱", "尝试新事物 ✨", "去运动 🏃"],
+        counselorCardTitle: "联系专业咨询师",
+        counselorCardDesc: "如果您感到痛苦，请寻求专业帮助",
+        counselorCallBtn: "拨打",
+        counselors: [
+            { name: "北京心理危机研究与干预中心", phone: "010-82951332", hours: "24小时" },
+            { name: "全国心理援助热线", phone: "400-161-9995", hours: "24小时" },
+            { name: "生命热线", phone: "400-821-1215", hours: "24小时" },
+        ],
         crisisKeywords: ["포기하고 싶어", "想消失", "想死"],
         task1Keywords: ["太累了", "精疲力竭", "倦怠", "힘들어"],
         crisisResponse: "听起来你现在承受着很大的压力。不必一个人扛着这些。今天可以试着和信任的人或专业咨询师聊聊吗？",

@@ -279,9 +279,15 @@ export default function Chat() {
     const [isLoadingResponse, setIsLoadingResponse] = useState(false);
     const [showActionChips, setShowActionChips] = useState(false);
     const [showBreakMessage, setShowBreakMessage] = useState(false);
+    const [showCounselorCard, setShowCounselorCard] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const ACTION_CHIPS = t.actionChips;
+    // 기분에 따라 액션 칩 선택
+    const ACTION_CHIPS = mood !== undefined
+        ? mood < 40 ? t.actionChipsLow
+        : mood < 70 ? t.actionChipsMid
+        : t.actionChipsHigh
+        : t.actionChips;
     const CRISIS_KEYWORDS = t.crisisKeywords;
     const TASK1_KEYWORDS = t.task1Keywords;
     const CRISIS_RESPONSE = t.crisisResponse;
@@ -372,18 +378,19 @@ export default function Chat() {
         setShowHistorySidebar(false);
     };
 
-    const handleSend = async () => {
-        if (!input.trim() || !persona) return;
+    const handleSend = async (overrideText?: string) => {
+        const messageText = overrideText ?? input;
+        if (!messageText.trim() || !persona) return;
         setShowActionChips(false);
         const userMessage: Message = {
             id: messages.length + 1,
-            text: input,
+            text: messageText,
             sender: "user",
             timestamp: new Date(),
         };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
-        setInput("");
+        if (!overrideText) setInput("");
         setIsLoadingResponse(true);
         try {
             if (!isGeminiInitialized())
@@ -406,6 +413,7 @@ export default function Chat() {
             let aiResponseText: string;
             if (isCrisis) {
                 aiResponseText = CRISIS_RESPONSE;
+                setShowCounselorCard(true);
             } else if (isTask1) {
                 aiResponseText = TASK1_RESPONSE;
                 setShowActionChips(true);
@@ -780,7 +788,7 @@ export default function Chat() {
                                     }`,
                                 }}
                             >
-                                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                                <p className="text-gray-800 text-[15px] leading-relaxed whitespace-pre-wrap">
                                     {message.text}
                                 </p>
                                 <p className="text-[10px] text-gray-400 mt-1.5 text-right">
@@ -801,7 +809,7 @@ export default function Chat() {
                                         "linear-gradient(135deg, #6BCB9A 0%, #2d5a3d 100%)",
                                 }}
                             >
-                                <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
+                                <p className="text-white text-[15px] leading-relaxed whitespace-pre-wrap">
                                     {message.text}
                                 </p>
                                 <p className="text-[10px] text-white/50 mt-1.5 text-right">
@@ -859,12 +867,39 @@ export default function Chat() {
                         {ACTION_CHIPS.map((chip) => (
                             <button
                                 key={chip}
-                                onClick={() => setShowActionChips(false)}
+                                onClick={() => handleSend(chip)}
                                 className="px-4 py-2 rounded-full text-sm font-medium bg-white/80 border border-[#6BCB9A]/40 text-[#355F4B] hover:bg-[#CFF3E4] hover:border-[#6BCB9A] transition-all shadow-sm"
                             >
                                 {chip}
                             </button>
                         ))}
+                    </div>
+                )}
+                {showCounselorCard && (
+                    <div className="ml-11 mr-2">
+                        <div className="bg-white/80 backdrop-blur-sm border border-[#6BCB9A]/30 rounded-2xl p-4 shadow-md">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-sm font-bold text-[#1a3d2b]">{t.counselorCardTitle}</p>
+                                <button onClick={() => setShowCounselorCard(false)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+                            </div>
+                            <p className="text-xs text-gray-500 mb-3">{t.counselorCardDesc}</p>
+                            <div className="space-y-2">
+                                {t.counselors.map((c) => (
+                                    <div key={c.phone} className="flex items-center justify-between bg-[#CFF3E4]/40 rounded-xl px-3 py-2">
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-700">{c.name}</p>
+                                            <p className="text-[10px] text-gray-400">{c.hours}</p>
+                                        </div>
+                                        <a
+                                            href={`tel:${c.phone}`}
+                                            className="flex items-center gap-1 px-3 py-1.5 bg-[#6BCB9A] text-white text-xs font-bold rounded-full hover:bg-[#5ab88a] transition-all"
+                                        >
+                                            📞 {c.phone}
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 )}
                 <div ref={messagesEndRef} />

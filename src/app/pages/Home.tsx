@@ -11,6 +11,7 @@ import {
     Trash2,
     X,
     Edit2,
+    Copy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Persona, CnipScores } from "../types/persona";
@@ -201,6 +202,19 @@ export default function Home() {
         navigate("/persona", { state: { editPersona: selected } });
     };
 
+    const handleDuplicate = () => {
+        if (!selected) return;
+        const saved: Persona[] = JSON.parse(localStorage.getItem("personas") || "[]");
+        const copy: Persona = {
+            ...selected,
+            id: Date.now().toString(),
+            name: `${selected.name} (2)`,
+        };
+        saved.push(copy);
+        localStorage.setItem("personas", JSON.stringify(saved));
+        setPersonas([...personas, copy]);
+    };
+
     const handleStartChat = () => {
         if (!selected) return;
         setSelectedMood(undefined);
@@ -372,6 +386,13 @@ export default function Home() {
                                     >
                                         <Edit2 className="w-3.5 h-3.5" />{" "}
                                         {t.edit}
+                                    </button>
+                                    <button
+                                        onClick={handleDuplicate}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 text-xs font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all"
+                                    >
+                                        <Copy className="w-3.5 h-3.5" />{" "}
+                                        {t.duplicate}
                                     </button>
                                     <button
                                         onClick={handleDelete}
