@@ -274,6 +274,21 @@ export default function Chat() {
     const [cnipValues, setCnipValues] = useState<number[]>(
         () => persona?.cnipValues ?? Array(18).fill(0)
     );
+
+    // 채팅 중 수정 다이얼로그용 슬라이더 — cnipScores를 -3..3 스케일로 변환
+    const scoresToSliders = (s?: { td: number; ei: number; pao: number; ws: number }) => {
+        if (!s) return [0, 0, 0, 0];
+        const cl = (v: number) => Math.max(-3, Math.min(3, v));
+        return [
+            cl(Math.round(s.td  / 5)),
+            cl(Math.round(s.ei  / 5)),
+            cl(Math.round(s.pao / 3)),
+            cl(Math.round(s.ws  / 5)),
+        ];
+    };
+    const [chatSliders, setChatSliders] = useState<number[]>(
+        () => scoresToSliders(persona?.cnipScores)
+    );
     const [savedThreads, setSavedThreads] = useState<Thread[]>([]);
     const [threadId] = useState(existingThread?.id || Date.now().toString());
     const [isLoadingResponse, setIsLoadingResponse] = useState(false);
@@ -351,11 +366,16 @@ export default function Chat() {
 
     const handleApplyPersonaChanges = () => {
         if (!editedPersona) return;
-        const newScores = calcCnipScores(cnipValues);
+        // chatSliders [-3..3] → 실제 점수 스케일 변환
+        const newScores = {
+            td:  chatSliders[0] * 5,
+            ei:  chatSliders[1] * 5,
+            pao: chatSliders[2] * 3,
+            ws:  chatSliders[3] * 5,
+        };
         const updated: Persona = {
             ...editedPersona,
             cnipScores: newScores,
-            cnipValues: [...cnipValues],
             description: getCnipDescription(newScores, t),
         };
         setEditedPersona(updated);
@@ -586,9 +606,7 @@ export default function Chat() {
                             <button
                                 onClick={() => {
                                     setShowPersonaEdit(false);
-                                    setCnipValues(
-                                        persona.cnipValues ?? Array(18).fill(0)
-                                    );
+                                    setChatSliders(scoresToSliders((editedPersona ?? persona).cnipScores));
                                 }}
                                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             >
@@ -641,13 +659,11 @@ export default function Chat() {
                                             min={-3}
                                             max={3}
                                             step={1}
-                                            value={cnipValues[idx]}
+                                            value={chatSliders[idx]}
                                             onChange={(e) => {
-                                                const next = [...cnipValues];
-                                                next[idx] = Number(
-                                                    e.target.value
-                                                );
-                                                setCnipValues(next);
+                                                const next = [...chatSliders];
+                                                next[idx] = Number(e.target.value);
+                                                setChatSliders(next);
                                             }}
                                             className="flex-1 accent-[#6BCB9A]"
                                         />
@@ -669,9 +685,7 @@ export default function Chat() {
                             <button
                                 onClick={() => {
                                     setShowPersonaEdit(false);
-                                    setCnipValues(
-                                        persona.cnipValues ?? Array(18).fill(0)
-                                    );
+                                    setChatSliders(scoresToSliders((editedPersona ?? persona).cnipScores));
                                 }}
                                 className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
                             >
