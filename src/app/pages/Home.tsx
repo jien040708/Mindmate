@@ -359,7 +359,7 @@ export default function Home() {
                 {/* ── 오른쪽 패널: 선택된 페르소나 상세 ── */}
                 <div className="w-1/2 flex flex-col overflow-hidden">
                     {selected ? (
-                        <div className="flex-1 min-h-0 flex flex-col px-6 py-4 gap-3 overflow-hidden">
+                        <div className="flex-1 min-h-0 flex flex-col px-6 py-3 gap-2 overflow-hidden">
                             {/* 이름 + 수정/삭제 버튼 */}
                             <div className="flex-shrink-0 flex items-center justify-between gap-3">
                                 <h2 className="text-xl font-bold text-gray-800 leading-tight truncate">
@@ -388,54 +388,51 @@ export default function Home() {
                                 {oneLiner}
                             </p>
 
-                            {/* 아바타 + C-NIP 카드 (가로 분할) */}
-                            <div className="flex-1 min-h-0 flex gap-3">
-                                {/* 아바타 */}
-                                <div className="flex-shrink-0 flex items-center">
-                                    {(() => {
-                                        const found = CHARACTER_OPTIONS.find(
-                                            (c) => c.id === selected.icon
-                                        );
-                                        return found ? (
-                                            <div className="h-full max-h-64 aspect-[3/4] rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
-                                                <img
-                                                    src={found.src}
-                                                    alt={selected.name}
-                                                    className="w-full h-full object-cover object-top"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <PersonaAvatar
-                                                persona={selected}
-                                                size={80}
-                                                ringClass="ring-4 ring-white shadow-2xl"
+                            {/* 아바타 (중앙) */}
+                            <div className="flex-shrink-0 flex justify-center">
+                                {(() => {
+                                    const found = CHARACTER_OPTIONS.find(
+                                        (c) => c.id === selected.icon
+                                    );
+                                    return found ? (
+                                        <div className="h-40 aspect-[3/4] rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
+                                            <img
+                                                src={found.src}
+                                                alt={selected.name}
+                                                className="w-full h-full object-cover object-top"
                                             />
-                                        );
-                                    })()}
-                                </div>
-
-                                {/* C-NIP 성향 카드 (2×2 그리드) */}
-                                {traitCards && (
-                                    <div className="flex-1 min-h-0 grid grid-cols-2 gap-2 content-start">
-                                        {traitCards.map((card) => (
-                                            <div
-                                                key={card.dimLabel}
-                                                className={`${card.bg} rounded-2xl p-2.5 flex flex-col justify-center`}
-                                            >
-                                                <p className="text-xs text-gray-400 font-medium mb-0.5">
-                                                    {card.dimLabel}
-                                                </p>
-                                                <p className={`text-sm font-bold ${card.color} leading-tight`}>
-                                                    {card.label}
-                                                </p>
-                                                <p className="text-xs text-gray-500 leading-snug mt-1">
-                                                    {card.desc}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                        </div>
+                                    ) : (
+                                        <PersonaAvatar
+                                            persona={selected}
+                                            size={80}
+                                            ringClass="ring-4 ring-white shadow-2xl"
+                                        />
+                                    );
+                                })()}
                             </div>
+
+                            {/* C-NIP 성향 카드 (2×2 그리드) */}
+                            {traitCards && (
+                                <div className="flex-1 min-h-0 grid grid-cols-2 gap-2">
+                                    {traitCards.map((card) => (
+                                        <div
+                                            key={card.dimLabel}
+                                            className={`${card.bg} rounded-2xl p-2.5 flex flex-col justify-center`}
+                                        >
+                                            <p className="text-xs text-gray-400 font-medium mb-0.5">
+                                                {card.dimLabel}
+                                            </p>
+                                            <p className={`text-sm font-bold ${card.color} leading-tight`}>
+                                                {card.label}
+                                            </p>
+                                            <p className="text-xs text-gray-500 leading-snug mt-1">
+                                                {card.desc}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             {/* 대화 시작 버튼 */}
                             <div className="flex-shrink-0">
