@@ -303,7 +303,19 @@ export default function Chat() {
         : mood < 70 ? t.actionChipsMid
         : t.actionChipsHigh
         : t.actionChips;
-    const CRISIS_KEYWORDS = t.crisisKeywords;
+    // 언어 설정과 무관하게 모든 언어 키워드를 항상 감지
+    const CRISIS_KEYWORDS = [
+        // 한국어
+        "다 포기하고 싶어", "포기하고 싶어", "다 그만하고 싶어", "사라지고 싶어",
+        "죽고 싶어", "죽고싶어", "자살", "자해", "테러", "폭발", "죽이고", "살인",
+        // English
+        "suicide", "self-harm", "kill myself", "want to die", "want to disappear",
+        "want to give up", "no reason to live", "can't go on", "terrorist", "bomb", "kill everyone",
+        // 日本語
+        "死にたい", "消えたい",
+        // 中文
+        "想死", "想消失",
+    ];
     const TASK1_KEYWORDS = t.task1Keywords;
     const CRISIS_RESPONSE = t.crisisResponse;
     const TASK1_RESPONSE = t.task1Response;
