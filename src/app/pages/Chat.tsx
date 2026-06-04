@@ -370,7 +370,7 @@ export default function Chat() {
             ...editedPersona,
             cnipScores: newScores,
             cnipValues: [...cnipValues],
-            description: getCnipDescription(newScores),
+            description: getCnipDescription(newScores, t),
         };
         setEditedPersona(updated);
         const saved = localStorage.getItem("personas");

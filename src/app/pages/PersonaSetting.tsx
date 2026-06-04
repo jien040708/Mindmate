@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router";
 import { ArrowRight, ArrowLeft, Camera } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { useLanguage } from "../contexts/LanguageContext";
+import { T } from "../i18n/translations";
 import { PersonaAvatar, CHARACTER_OPTIONS } from "../components/PersonaAvatar";
 
 const SCALE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
@@ -62,89 +63,41 @@ export function calcCnipScores(values: number[]): CnipScores {
     };
 }
 
-export function getTraitLabels(scores: CnipScores) {
+export function getTraitLabels(scores: CnipScores, t: T) {
     const td =
         scores.td >= 8
-            ? {
-                  label: "AI 주도",
-                  color: "text-blue-600",
-                  desc: "대화와 목표를 AI가 능동적으로 이끌어요",
-              }
+            ? { label: t.traitTD_high, color: "text-blue-600",   desc: t.descTD_high }
             : scores.td <= -3
-            ? {
-                  label: "내담자 주도",
-                  color: "text-purple-600",
-                  desc: "내가 원하는 방향으로 자유롭게 대화해요",
-              }
-            : {
-                  label: "균형",
-                  color: "text-green-600",
-                  desc: "상황에 맞게 유연하게 조율해요",
-              };
+            ? { label: t.traitTD_low,  color: "text-purple-600", desc: t.descTD_low  }
+            : { label: t.traitTD_mid,  color: "text-green-600",  desc: t.descTD_mid  };
 
     const ei =
         scores.ei >= 7
-            ? {
-                  label: "감정 집중",
-                  color: "text-rose-600",
-                  desc: "깊은 감정을 충분히 탐색하고 표현해요",
-              }
+            ? { label: t.traitEI_high, color: "text-rose-600",   desc: t.descEI_high }
             : scores.ei <= -1
-            ? {
-                  label: "이성/논리",
-                  color: "text-sky-600",
-                  desc: "사실과 논리 중심으로 상황을 분석해요",
-              }
-            : {
-                  label: "균형",
-                  color: "text-green-600",
-                  desc: "감정과 논리를 균형 있게 다뤄요",
-              };
+            ? { label: t.traitEI_low,  color: "text-sky-600",    desc: t.descEI_low  }
+            : { label: t.traitEI_mid,  color: "text-green-600",  desc: t.descEI_mid  };
 
     const pao =
         scores.pao >= 3
-            ? {
-                  label: "과거 지향",
-                  color: "text-amber-600",
-                  desc: "과거 경험과 어린 시절을 중심으로 탐색해요",
-              }
+            ? { label: t.traitPaO_high, color: "text-amber-600", desc: t.descPaO_high }
             : scores.pao <= -3
-            ? {
-                  label: "현재/미래 지향",
-                  color: "text-teal-600",
-                  desc: "지금 할 수 있는 것과 미래 목표에 집중해요",
-              }
-            : {
-                  label: "균형",
-                  color: "text-green-600",
-                  desc: "과거 맥락과 현재 상황을 함께 살펴요",
-              };
+            ? { label: t.traitPaO_low,  color: "text-teal-600",  desc: t.descPaO_low  }
+            : { label: t.traitPaO_mid,  color: "text-green-600", desc: t.descPaO_mid  };
 
     const ws =
         scores.ws >= 4
-            ? {
-                  label: "따뜻한 지지",
-                  color: "text-orange-500",
-                  desc: "무조건적인 공감과 긍정적 존중을 제공해요",
-              }
+            ? { label: t.traitWS_high, color: "text-orange-500", desc: t.descWS_high }
             : scores.ws <= -4
-            ? {
-                  label: "직면/도전",
-                  color: "text-red-600",
-                  desc: "논리적 오류나 모순을 직접적으로 짚어줘요",
-              }
-            : {
-                  label: "균형",
-                  color: "text-green-600",
-                  desc: "지지하면서도 필요할 때 솔직한 피드백을 줘요",
-              };
+            ? { label: t.traitWS_low,  color: "text-red-600",    desc: t.descWS_low  }
+            : { label: t.traitWS_mid,  color: "text-green-600",  desc: t.descWS_mid  };
 
     return { td, ei, pao, ws };
 }
 
-export function getCnipDescription(scores: CnipScores): string {
-    const t = getTraitLabels(scores);
-    return `${t.td.label} · ${t.ei.label} · ${t.pao.label} · ${t.ws.label} 상담가`;
+export function getCnipDescription(scores: CnipScores, t: T): string {
+    const labels = getTraitLabels(scores, t);
+    return `${labels.td.label} · ${labels.ei.label} · ${labels.pao.label} · ${labels.ws.label}${t.counselorSuffix}`;
 }
 
 // ─── 7-circle 선택기 ───────────────────────────────────────────────────────────
@@ -258,7 +211,7 @@ export default function PersonaSetting() {
             const updated: Persona = {
                 ...editPersona,
                 name: trimmedName,
-                description: getCnipDescription(scores),
+                description: getCnipDescription(scores, t),
                 color: selectedColor,
                 icon: selectedIcon,
                 avatarDataUrl,
@@ -282,7 +235,7 @@ export default function PersonaSetting() {
                 id: Date.now().toString(),
                 name: trimmedName,
                 mbti: "",
-                description: getCnipDescription(scores),
+                description: getCnipDescription(scores, t),
                 color: selectedColor,
                 icon: selectedIcon,
                 avatarDataUrl,
@@ -335,7 +288,7 @@ export default function PersonaSetting() {
                         {/* 아이콘 */}
                         <div className="space-y-6 gap-3">
                             <label className="text-sm font-bold text-gray-700">
-                                캐릭터
+                                {t.character}
                             </label>
 
                             {/* 캐릭터 */}
@@ -386,8 +339,8 @@ export default function PersonaSetting() {
                                 >
                                     <Camera className="w-4 h-4" />
                                     {avatarDataUrl
-                                        ? "사진 변경"
-                                        : "사진 업로드"}
+                                        ? t.changePhoto
+                                        : t.uploadPhoto}
                                 </button>
                             </div>
                         </div>
