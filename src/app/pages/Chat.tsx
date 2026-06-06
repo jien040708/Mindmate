@@ -318,7 +318,16 @@ export default function Chat() {
         // 中文
         "想死", "想消失",
     ];
-    const TASK1_KEYWORDS = t.task1Keywords;
+    const TASK1_KEYWORDS = [
+        // 한국어
+        "너무 바빴어", "너무 힘들었어", "지쳤어", "너무 피곤해", "번아웃", "힘들어",
+        // English
+        "too busy", "exhausted", "burned out", "so tired", "burnout", "drained",
+        // 日本語
+        "疲れた", "バーンアウト", "くたくた",
+        // 中文
+        "太累了", "精疲力竭", "倦怠",
+    ];
     const CRISIS_RESPONSE = t.crisisResponse;
     const TASK1_RESPONSE = t.task1Response;
     const BREAK_MESSAGE = t.breakMessage;
