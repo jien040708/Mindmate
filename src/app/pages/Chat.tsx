@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Send, ArrowLeft, History, X, SlidersHorizontal } from "lucide-react";
+import { Send, ArrowLeft, History, X, SlidersHorizontal, Phone } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { Thread, Message } from "../types/thread";
 import { sendMessageToGemini, isGeminiInitialized, generateActionChips } from "../services/gemini";
@@ -932,8 +932,8 @@ export default function Chat() {
                                         key={c.phone}
                                         className="flex flex-col items-center bg-[#CFF3E4]/40 border border-[#6BCB9A]/30 rounded-2xl px-3 py-3 gap-2"
                                     >
-                                        <div className="w-10 h-10 rounded-full bg-[#CFF3E4] flex items-center justify-center text-lg flex-shrink-0">
-                                            📞
+                                        <div className="w-10 h-10 rounded-full bg-[#CFF3E4] flex items-center justify-center flex-shrink-0">
+                                            <Phone className="w-5 h-5 text-[#6BCB9A]" />
                                         </div>
                                         <div className="text-center flex-1">
                                             <p className="text-[11px] font-bold text-gray-700 leading-tight">{c.name}</p>
