@@ -9,7 +9,10 @@
       "Bash(cmake -B build -S .)",
       "Bash(which cmake3 *)",
       "PowerShell(Get-Command cmake -ErrorAction SilentlyContinue)",
-      "PowerShell(Get-Command cmake.exe -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-Command cmake.exe -ErrorAction SilentlyContinue)",
+      "Bash(ssh ubuntu@172.10.5.107 \"cat ~/project3-jien040708/test/common.rs | head -100\")",
+      "Bash(ssh ubuntu@172.10.5.107 \"source ~/.cargo/env && cd ~/project3-jien040708 && cargo build --release --features debug --bin test_task 2>&1 | tail -3 && systemd-run --scope --user -q -p 'MemoryMax=131072000' -p 'MemorySwapMax=0' target/release/test_task task2_1 count 2>&1\")",
+      "Bash(ssh ubuntu@172.10.5.107 \"journalctl --user -n 5 2>/dev/null || true\")"
     ]
   }
 }
