@@ -163,7 +163,7 @@ app.post("/make-server-c31a62f1/chat", async (c) => {
     }
 
     const body = await c.req.json();
-    const { message, persona, conversationHistory, mood, language, isChipMessage } = body;
+    const { message, persona, conversationHistory, mood, language } = body;
 
     if (!message || !persona) {
       return c.json({ error: "Missing required fields: message and persona" }, 400);
@@ -191,21 +191,10 @@ Do NOT mix languages. Reply only in ${targetLang}.`;
 
     const counselingBlock = buildPersonaSystemPrompt(persona);
 
-    // ── 칩 메시지 전용 지시 ────────────────────────────────────────────────────
-    const chipInstruction = isChipMessage ? `
-
-[CHIP RESPONSE — SPECIAL INSTRUCTION]
-The user just selected a self-care activity: "${message}"
-Respond in this exact structure (in ${targetLang}):
-1. Warmly endorse the activity in 1–2 sentences that feel natural for your counseling style.
-2. Encourage them to go do it right now.
-3. End with ONE question asking them to come back and share how it went (e.g. what they experienced, how they felt, what happened).
-Keep it warm, brief, and conversational. Do NOT ask multiple questions.` : "";
-
     const systemInstruction = `${languageBlock}
 
 ${counselingBlock}
-${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}${chipInstruction}`;
+${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}`;
 
     // Build conversation contents
     const contents = [];
@@ -284,72 +273,6 @@ ${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}${chipInstruc
   } catch (error) {
     console.log(`Error in chat endpoint: ${error}`);
     return c.json({ error: `Server error: ${error instanceof Error ? error.message : "Unknown error"}` }, 500);
-  }
-});
-
-// ─── Action Chips 생성 엔드포인트 ──────────────────────────────────────────────
-app.post("/make-server-c31a62f1/chips", async (c) => {
-  try {
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) return c.json({ chips: [] }, 500);
-
-    const { message, persona, mood, language } = await c.req.json();
-
-    const langName: Record<string, string> = {
-      Korean: "Korean (한국어)", English: "English",
-      Japanese: "Japanese (日本語)", Chinese: "Chinese (中文)",
-    };
-    const targetLang = language ? (langName[language] ?? language) : "Korean (한국어)";
-
-    // 페르소나 성향 요약
-    const cnip = persona?.cnipScores;
-    const styleHint = cnip
-      ? `Warmth: ${cnip.ws >= 4 ? "very warm & supportive" : cnip.ws <= -4 ? "direct & challenging" : "balanced"}. ` +
-        `Directiveness: ${cnip.td >= 8 ? "AI-led" : cnip.td <= -3 ? "client-led" : "balanced"}.`
-      : (persona?.description ?? "balanced counselor");
-
-    const moodDesc = mood !== undefined
-      ? `${mood}/100 (${mood < 40 ? "low — user feeling down" : mood < 70 ? "moderate" : "high — user feeling good"})`
-      : "unknown";
-
-    const prompt = `You are helping a mental health AI counselor suggest self-care actions to a user.
-
-Context:
-- User just said: "${message}"
-- Counselor style: ${styleHint}
-- User mood: ${moodDesc}
-
-Generate exactly 3 short, actionable self-care suggestions in ${targetLang}.
-Requirements:
-- Each suggestion must be 4–7 words + 1 emoji (like a button label)
-- Be SPECIFIC to what the user expressed (not generic)
-- Match the counselor's warmth level: warm style → gentle/comforting, direct style → practical/action-oriented
-- If mood is low, suggest restorative activities; if high, suggest energizing ones
-
-Return ONLY a valid JSON array of exactly 3 strings. No explanation, no markdown.
-Example format: ["Take a short walk 🚶", "Text a close friend 📱", "Make warm tea ☕"]`;
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 150 },
-      }),
-    });
-
-    if (!res.ok) return c.json({ chips: [] });
-
-    const data = await res.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "[]";
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) return c.json({ chips: [] });
-
-    const chips = JSON.parse(match[0]);
-    return c.json({ chips: Array.isArray(chips) ? chips.slice(0, 3) : [] });
-  } catch (_e) {
-    return c.json({ chips: [] });
   }
 });
 

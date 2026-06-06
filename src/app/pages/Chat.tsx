@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Send, ArrowLeft, History, X, SlidersHorizontal, Phone } from "lucide-react";
+import { Send, ArrowLeft, History, X, SlidersHorizontal } from "lucide-react";
 import { Persona, CnipScores } from "../types/persona";
 import { Thread, Message } from "../types/thread";
-import { sendMessageToGemini, isGeminiInitialized, generateActionChips } from "../services/gemini";
+import { sendMessageToGemini, isGeminiInitialized } from "../services/gemini";
 import { calcCnipScores, getCnipDescription } from "./PersonaSetting";
 import { useLanguage } from "../contexts/LanguageContext";
 import { T } from "../i18n/translations";
@@ -274,63 +274,39 @@ export default function Chat() {
     const [cnipValues, setCnipValues] = useState<number[]>(
         () => persona?.cnipValues ?? Array(18).fill(0)
     );
-
-    // 채팅 중 수정 다이얼로그용 슬라이더 — 페르소나 설명 레이블과 1:1 대응
-    // 각 차원의 임계값 기준으로 3구간(-3 / 0 / +3)에 배치
-    const scoresToSliders = (s?: { td: number; ei: number; pao: number; ws: number }) => {
-        if (!s) return [0, 0, 0, 0];
-        return [
-            s.td  >= 8  ? 3 : s.td  <= -3 ? -3 : 0,  // TD: AI주도 / 균형 / 내담자주도
-            s.ei  >= 7  ? 3 : s.ei  <= -1 ? -3 : 0,  // EI: 감정집중 / 균형 / 이성논리
-            s.pao >= 3  ? 3 : s.pao <= -3 ? -3 : 0,  // PAO: 과거 / 균형 / 현재미래
-            s.ws  >= 4  ? 3 : s.ws  <= -4 ? -3 : 0,  // WS: 따뜻한지지 / 균형 / 직면도전
-        ];
-    };
-    const [chatSliders, setChatSliders] = useState<number[]>(
-        () => scoresToSliders(persona?.cnipScores)
-    );
     const [savedThreads, setSavedThreads] = useState<Thread[]>([]);
     const [threadId] = useState(existingThread?.id || Date.now().toString());
     const [isLoadingResponse, setIsLoadingResponse] = useState(false);
     const [showActionChips, setShowActionChips] = useState(false);
-    const [dynamicChips, setDynamicChips] = useState<string[]>([]);
     const [showBreakMessage, setShowBreakMessage] = useState(false);
-    const [showCounselorCard, setShowCounselorCard] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Gemini가 생성한 칩이 있으면 우선 사용, 없으면 기분 기반 fallback
-    const fallbackChips = mood !== undefined
-        ? mood < 40 ? t.actionChipsLow
-        : mood < 70 ? t.actionChipsMid
-        : t.actionChipsHigh
-        : t.actionChips;
-    const ACTION_CHIPS = dynamicChips.length > 0 ? dynamicChips : fallbackChips;
-    // 언어 설정과 무관하게 모든 언어 키워드를 항상 감지
+    const ACTION_CHIPS = [
+        "잠깐 산책하기 🚶",
+        "맛있는 음식 먹기 🍜",
+        "힐링 영화 보기 🎬",
+    ];
     const CRISIS_KEYWORDS = [
-        // 한국어
-        "다 포기하고 싶어", "포기하고 싶어", "다 그만하고 싶어", "사라지고 싶어",
-        "죽고 싶어", "죽고싶어", "자살", "자해", "테러", "폭발", "죽이고", "살인",
-        // English
-        "suicide", "self-harm", "kill myself", "want to die", "want to disappear",
-        "want to give up", "no reason to live", "can't go on", "terrorist", "bomb", "kill everyone",
-        // 日本語
-        "死にたい", "消えたい",
-        // 中文
-        "想死", "想消失",
+        "다 포기하고 싶어",
+        "포기하고 싶어",
+        "다 그만하고 싶어",
+        "사라지고 싶어",
+        "죽고 싶어",
     ];
     const TASK1_KEYWORDS = [
-        // 한국어
-        "너무 바빴어", "너무 힘들었어", "지쳤어", "너무 피곤해", "번아웃", "힘들어",
-        // English
-        "too busy", "exhausted", "burned out", "so tired", "burnout", "drained",
-        // 日本語
-        "疲れた", "バーンアウト", "くたくた",
-        // 中文
-        "太累了", "精疲力竭", "倦怠",
+        "너무 바빴어",
+        "너무 힘들었어",
+        "지쳤어",
+        "너무 피곤해",
+        "번아웃",
+        "힘들어",
     ];
-    const CRISIS_RESPONSE = t.crisisResponse;
-    const TASK1_RESPONSE = t.task1Response;
-    const BREAK_MESSAGE = t.breakMessage;
+    const CRISIS_RESPONSE =
+        "지금 정말 많이 버거운 상태인 것 같아. 혼자서 다 감당하려고 하지 않았으면 좋겠어. 혹시 오늘은 믿을 수 있는 사람이나 전문 상담사와도 이야기해볼래?";
+    const TASK1_RESPONSE =
+        "정말 많이 지쳤겠다. 오늘 하루 수고 많았어. 잠깐이라도 나 자신을 위한 시간을 가져보는 건 어때?";
+    const BREAK_MESSAGE =
+        "오늘 이야기 나누면서 많은 생각이 정리됐을 것 같아. 혹시 오늘 있었던 일을 일기로 한번 적어보는 건 어때? 글로 쓰다 보면 마음이 더 정리될 수 있거든. 다 적으면 나한테도 알려줘 😊";
 
     const scrollToBottom = () => {
         const el = messagesEndRef.current?.parentElement;
@@ -389,17 +365,12 @@ export default function Chat() {
 
     const handleApplyPersonaChanges = () => {
         if (!editedPersona) return;
-        // chatSliders [-3..3] → 실제 점수 스케일 변환
-        const newScores = {
-            td:  chatSliders[0] * 5,
-            ei:  chatSliders[1] * 5,
-            pao: chatSliders[2] * 3,
-            ws:  chatSliders[3] * 5,
-        };
+        const newScores = calcCnipScores(cnipValues);
         const updated: Persona = {
             ...editedPersona,
             cnipScores: newScores,
-            description: getCnipDescription(newScores, t),
+            cnipValues: [...cnipValues],
+            description: getCnipDescription(newScores),
         };
         setEditedPersona(updated);
         const saved = localStorage.getItem("personas");
@@ -421,19 +392,18 @@ export default function Chat() {
         setShowHistorySidebar(false);
     };
 
-    const handleSend = async (overrideText?: string, isChipClick?: boolean) => {
-        const messageText = overrideText ?? input;
-        if (!messageText.trim() || !persona) return;
+    const handleSend = async () => {
+        if (!input.trim() || !persona) return;
         setShowActionChips(false);
         const userMessage: Message = {
             id: messages.length + 1,
-            text: messageText,
+            text: input,
             sender: "user",
             timestamp: new Date(),
         };
         const newMessages = [...messages, userMessage];
         setMessages(newMessages);
-        if (!overrideText) setInput("");
+        setInput("");
         setIsLoadingResponse(true);
         try {
             if (!isGeminiInitialized())
@@ -456,23 +426,16 @@ export default function Chat() {
             let aiResponseText: string;
             if (isCrisis) {
                 aiResponseText = CRISIS_RESPONSE;
-                setShowCounselorCard(true);
             } else if (isTask1) {
                 aiResponseText = TASK1_RESPONSE;
-                setDynamicChips([]);   // 이전 칩 초기화
                 setShowActionChips(true);
-                // 백그라운드에서 Gemini가 contextual 칩 생성 (완료되면 교체)
-                generateActionChips(userMessage.text, editedPersona ?? persona, mood, language)
-                    .then(chips => { if (chips.length > 0) setDynamicChips(chips); })
-                    .catch(() => {});
             } else {
                 aiResponseText = await sendMessageToGemini(
                     userMessage.text,
                     editedPersona ?? persona,
                     messages,
                     mood,
-                    language,
-                    isChipClick
+                    language
                 );
             }
 
@@ -630,12 +593,14 @@ export default function Chat() {
                     <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full shadow-[0_24px_80px_rgba(0,0,0,0.2)] border border-white/60">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-xl font-bold text-gray-800">
-                                {t.adjustStyle}
+                                대화 스타일 조정
                             </h3>
                             <button
                                 onClick={() => {
                                     setShowPersonaEdit(false);
-                                    setChatSliders(scoresToSliders((editedPersona ?? persona).cnipScores));
+                                    setCnipValues(
+                                        persona.cnipValues ?? Array(18).fill(0)
+                                    );
                                 }}
                                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             >
@@ -643,33 +608,34 @@ export default function Chat() {
                             </button>
                         </div>
                         <p className="text-sm text-gray-400 mb-8">
-                            {t.adjustStyleSubtitle}
+                            대화가 마음에 들지 않으셨나요? 아래에서 조금씩
+                            조정해보세요
                         </p>
 
                         <div className="space-y-8">
                             {[
                                 {
-                                    label: t.directiveness,
-                                    left: t.chatAdjustClientLead,
-                                    right: t.chatAdjustCounselorLead,
+                                    label: "주도성",
+                                    left: "내가 이끌기",
+                                    right: "상담사가 이끌기",
                                     idx: 0,
                                 },
                                 {
-                                    label: t.emotionFocus,
-                                    left: t.chatAdjustLogic,
-                                    right: t.chatAdjustEmotion,
+                                    label: "감정 초점",
+                                    left: "생각 / 분석",
+                                    right: "감정 / 공감",
                                     idx: 1,
                                 },
                                 {
-                                    label: t.timeOrientation,
-                                    left: t.chatAdjustPresent,
-                                    right: t.chatAdjustPast,
+                                    label: "시간 지향",
+                                    left: "현재 / 미래",
+                                    right: "과거 / 경험",
                                     idx: 2,
                                 },
                                 {
-                                    label: t.feedbackStyle,
-                                    left: t.chatAdjustEmpathy,
-                                    right: t.chatAdjustDirect,
+                                    label: "피드백",
+                                    left: "공감 위주",
+                                    right: "직접적 피드백",
                                     idx: 3,
                                 },
                             ].map(({ label, left, right, idx }) => (
@@ -688,11 +654,13 @@ export default function Chat() {
                                             min={-3}
                                             max={3}
                                             step={1}
-                                            value={chatSliders[idx]}
+                                            value={cnipValues[idx]}
                                             onChange={(e) => {
-                                                const next = [...chatSliders];
-                                                next[idx] = Number(e.target.value);
-                                                setChatSliders(next);
+                                                const next = [...cnipValues];
+                                                next[idx] = Number(
+                                                    e.target.value
+                                                );
+                                                setCnipValues(next);
                                             }}
                                             className="flex-1 accent-[#6BCB9A]"
                                         />
@@ -709,16 +677,18 @@ export default function Chat() {
                                 onClick={handleApplyPersonaChanges}
                                 className="flex-1 bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] text-white px-6 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all"
                             >
-                                {t.apply}
+                                적용하기
                             </button>
                             <button
                                 onClick={() => {
                                     setShowPersonaEdit(false);
-                                    setChatSliders(scoresToSliders((editedPersona ?? persona).cnipScores));
+                                    setCnipValues(
+                                        persona.cnipValues ?? Array(18).fill(0)
+                                    );
                                 }}
                                 className="flex-1 bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-semibold hover:bg-gray-200 transition-all"
                             >
-                                {t.cancel}
+                                취소
                             </button>
                         </div>
                     </div>
@@ -831,7 +801,7 @@ export default function Chat() {
                                     }`,
                                 }}
                             >
-                                <p className="text-gray-800 text-[15px] leading-relaxed whitespace-pre-wrap">
+                                <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
                                     {message.text}
                                 </p>
                                 <p className="text-[10px] text-gray-400 mt-1.5 text-right">
@@ -852,7 +822,7 @@ export default function Chat() {
                                         "linear-gradient(135deg, #6BCB9A 0%, #2d5a3d 100%)",
                                 }}
                             >
-                                <p className="text-white text-[15px] leading-relaxed whitespace-pre-wrap">
+                                <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
                                     {message.text}
                                 </p>
                                 <p className="text-[10px] text-white/50 mt-1.5 text-right">
@@ -910,54 +880,12 @@ export default function Chat() {
                         {ACTION_CHIPS.map((chip) => (
                             <button
                                 key={chip}
-                                onClick={() => handleSend(chip, true)}
+                                onClick={() => setShowActionChips(false)}
                                 className="px-4 py-2 rounded-full text-sm font-medium bg-white/80 border border-[#6BCB9A]/40 text-[#355F4B] hover:bg-[#CFF3E4] hover:border-[#6BCB9A] transition-all shadow-sm"
                             >
                                 {chip}
                             </button>
                         ))}
-                    </div>
-                )}
-                {showCounselorCard && (
-                    <div className="ml-11 mr-2">
-                        <div className="bg-white/90 backdrop-blur-sm border border-[#CFF3E4] rounded-2xl p-4 shadow-lg">
-                            {/* 헤더 */}
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-lg">💚</span>
-                                    <p className="text-sm font-bold text-[#1a3d2b]">{t.counselorCardTitle}</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowCounselorCard(false)}
-                                    className="text-gray-300 hover:text-gray-500 transition-colors text-base leading-none"
-                                >✕</button>
-                            </div>
-                            <p className="text-xs text-gray-400 mb-3 ml-7">{t.counselorCardDesc}</p>
-
-                            {/* 상담사 카드 그리드 */}
-                            <div className="grid grid-cols-3 gap-2">
-                                {t.counselors.map((c) => (
-                                    <div
-                                        key={c.phone}
-                                        className="flex flex-col items-center bg-[#CFF3E4]/40 border border-[#6BCB9A]/30 rounded-2xl px-3 py-3 gap-2"
-                                    >
-                                        <div className="w-10 h-10 rounded-full bg-[#CFF3E4] flex items-center justify-center flex-shrink-0">
-                                            <Phone className="w-5 h-5 text-[#6BCB9A]" />
-                                        </div>
-                                        <div className="text-center flex-1">
-                                            <p className="text-[11px] font-bold text-gray-700 leading-tight">{c.name}</p>
-                                            <p className="text-[10px] text-gray-400 mt-0.5">{c.hours}</p>
-                                        </div>
-                                        <a
-                                            href={`tel:${c.phone}`}
-                                            className="w-full flex items-center justify-center gap-1 py-2 bg-[#6BCB9A] hover:bg-[#5ab88a] text-white text-xs font-bold rounded-xl transition-all active:scale-95 shadow-sm"
-                                        >
-                                            {t.counselorCallBtn} {c.phone}
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 )}
                 <div ref={messagesEndRef} />

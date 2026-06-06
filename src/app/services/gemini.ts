@@ -18,8 +18,7 @@ export async function sendMessageToGemini(
   persona: Persona,
   conversationHistory: Message[],
   mood?: number,
-  language?: string,
-  isChipMessage?: boolean
+  language?: string
 ): Promise<string> {
   try {
     const response = await fetch(
@@ -32,11 +31,11 @@ export async function sendMessageToGemini(
         },
         body: JSON.stringify({
           message: userMessage,
+          // avatarDataUrl은 base64 이미지라 수 MB → 제거 후 전송
           persona: { ...persona, avatarDataUrl: undefined },
           conversationHistory,
           mood,
           language,
-          isChipMessage: isChipMessage ?? false,
         }),
       }
     );
@@ -59,36 +58,5 @@ export async function sendMessageToGemini(
       throw error;
     }
     throw new Error('Failed to get response from AI. Please try again.');
-  }
-}
-
-export async function generateActionChips(
-  message: string,
-  persona: Persona,
-  mood?: number,
-  language?: string
-): Promise<string[]> {
-  try {
-    const response = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/make-server-c31a62f1/chips`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${publicAnonKey}`,
-        },
-        body: JSON.stringify({
-          message,
-          persona: { ...persona, avatarDataUrl: undefined },
-          mood,
-          language,
-        }),
-      }
-    );
-    if (!response.ok) return [];
-    const data = await response.json();
-    return Array.isArray(data.chips) ? data.chips : [];
-  } catch {
-    return [];
   }
 }

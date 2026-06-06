@@ -11,7 +11,6 @@ import {
     Trash2,
     X,
     Edit2,
-    Copy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Persona, CnipScores } from "../types/persona";
@@ -202,19 +201,6 @@ export default function Home() {
         navigate("/persona", { state: { editPersona: selected } });
     };
 
-    const handleDuplicate = () => {
-        if (!selected) return;
-        const saved: Persona[] = JSON.parse(localStorage.getItem("personas") || "[]");
-        const copy: Persona = {
-            ...selected,
-            id: Date.now().toString(),
-            name: `${selected.name} (2)`,
-        };
-        saved.push(copy);
-        localStorage.setItem("personas", JSON.stringify(saved));
-        setPersonas([...personas, copy]);
-    };
-
     const handleStartChat = () => {
         if (!selected) return;
         setSelectedMood(undefined);
@@ -301,7 +287,7 @@ export default function Home() {
                     </div>
 
                     {/* 3열 그리드 목록 */}
-                    <div className="flex-1 min-h-0 overflow-y-auto p-3">
+                    <div className="flex-1 overflow-y-auto p-3">
                         {personas.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center py-8 text-gray-400">
                                 <User className="w-10 h-10 mb-3 opacity-30" />
@@ -319,7 +305,7 @@ export default function Home() {
                                         <button
                                             key={persona.id}
                                             onClick={() => setSelected(persona)}
-                                            className={`flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-2xl border-2 transition-all ${
+                                            className={`flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border-2 transition-all ${
                                                 isSelected
                                                     ? "bg-gradient-to-b from-[#6BCB9A]/20 to-[#6BCB9A]/10 border-[#6BCB9A] shadow-md"
                                                     : "bg-white/60 border-transparent hover:border-[#6BCB9A]/40 hover:bg-white/80"
@@ -333,11 +319,11 @@ export default function Home() {
                                                             persona.icon
                                                     );
                                                 return found ? (
-                                                    <div className="w-full aspect-[3/4] rounded-xl overflow-hidden shadow-sm">
+                                                    <div className="w-48 h-60 rounded-xl overflow-hidden shadow-sm">
                                                         <img
                                                             src={found.src}
                                                             alt={persona.name}
-                                                            className="w-full h-full object-cover object-top"
+                                                            className="w-full h-full object-cover"
                                                         />
                                                     </div>
                                                 ) : (
@@ -373,10 +359,10 @@ export default function Home() {
                 {/* ── 오른쪽 패널: 선택된 페르소나 상세 ── */}
                 <div className="w-1/2 flex flex-col overflow-hidden">
                     {selected ? (
-                        <div className="flex-1 min-h-0 flex flex-col px-6 py-3 gap-2 overflow-hidden">
+                        <div className="flex-1 flex flex-col px-8 py-6 gap-4">
                             {/* 이름 + 수정/삭제 버튼 */}
-                            <div className="flex-shrink-0 flex items-center justify-between gap-3">
-                                <h2 className="text-xl font-bold text-gray-800 leading-tight truncate">
+                            <div className="flex items-start justify-between gap-3">
+                                <h2 className="text-2xl font-bold text-gray-800 leading-tight">
                                     {selected.name}
                                 </h2>
                                 <div className="flex gap-2 flex-shrink-0">
@@ -386,13 +372,6 @@ export default function Home() {
                                     >
                                         <Edit2 className="w-3.5 h-3.5" />{" "}
                                         {t.edit}
-                                    </button>
-                                    <button
-                                        onClick={handleDuplicate}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 text-xs font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all"
-                                    >
-                                        <Copy className="w-3.5 h-3.5" />{" "}
-                                        {t.duplicate}
                                     </button>
                                     <button
                                         onClick={handleDelete}
@@ -405,47 +384,52 @@ export default function Home() {
                             </div>
 
                             {/* 한 줄 설명 */}
-                            <p className="flex-shrink-0 text-xs text-gray-500 leading-relaxed">
+                            <p className="text-sm text-gray-500 leading-relaxed items-center">
                                 {oneLiner}
                             </p>
 
                             {/* 아바타 (중앙) */}
-                            <div className="flex-1 min-h-0 flex justify-center">
-                                {(() => {
-                                    const found = CHARACTER_OPTIONS.find(
-                                        (c) => c.id === selected.icon
-                                    );
-                                    return found ? (
-                                        <div className="h-full aspect-[3/4] rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
+                            {(() => {
+                                const found = CHARACTER_OPTIONS.find(
+                                    (c) => c.id === selected.icon
+                                );
+                                return found ? (
+                                    <div className="flex justify-center">
+                                        <div className="w-80 h-100 rounded-2xl overflow-hidden ring-4 ring-white shadow-2xl">
                                             <img
                                                 src={found.src}
                                                 alt={selected.name}
-                                                className="w-full h-full object-cover object-top"
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
-                                    ) : (
-                                        <PersonaAvatar
-                                            persona={selected}
-                                            size={96}
-                                            ringClass="ring-4 ring-white shadow-2xl"
-                                        />
-                                    );
-                                })()}
-                            </div>
+                                    </div>
+                                ) : (
+                                    <PersonaAvatar
+                                        persona={selected}
+                                        size={96}
+                                        ringClass="ring-4 ring-white shadow-2xl"
+                                    />
+                                );
+                            })()}
 
                             {/* C-NIP 성향 카드 (2×2 그리드) */}
                             {traitCards && (
-                                <div className="flex-shrink-0 grid grid-cols-2 gap-1.5">
+                                <div className="grid grid-cols-2 gap-2 flex-1">
                                     {traitCards.map((card) => (
                                         <div
                                             key={card.dimLabel}
-                                            className={`${card.bg} rounded-xl px-3 py-2 flex flex-col gap-0.5`}
+                                            className={`${card.bg} rounded-2xl p-3 flex flex-col justify-center`}
                                         >
-                                            <p className="text-[10px] text-gray-400 font-medium leading-none">
+                                            <p className="text-sm text-gray-400 font-medium mb-1">
                                                 {card.dimLabel}
                                             </p>
-                                            <p className={`text-xs font-bold ${card.color} leading-tight`}>
+                                            <p
+                                                className={`text-xl font-bold ${card.color} mb-1`}
+                                            >
                                                 {card.label}
+                                            </p>
+                                            <p className="text-sm text-gray-500 leading-snug mt-1">
+                                                {card.desc}
                                             </p>
                                         </div>
                                     ))}
@@ -453,10 +437,10 @@ export default function Home() {
                             )}
 
                             {/* 대화 시작 버튼 */}
-                            <div className="flex-shrink-0">
+                            <div className="mt-auto pt-2">
                                 <button
                                     onClick={handleStartChat}
-                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-full bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] text-white font-bold text-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-gradient-to-r from-[#6BCB9A] to-[#6BCB9A] text-white font-bold text-base hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
                                 >
                                     <MessageCircle className="w-5 h-5" />
                                     {t.startConversation}
