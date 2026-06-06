@@ -412,7 +412,7 @@ export default function Chat() {
         setShowHistorySidebar(false);
     };
 
-    const handleSend = async (overrideText?: string) => {
+    const handleSend = async (overrideText?: string, isChipClick?: boolean) => {
         const messageText = overrideText ?? input;
         if (!messageText.trim() || !persona) return;
         setShowActionChips(false);
@@ -462,7 +462,8 @@ export default function Chat() {
                     editedPersona ?? persona,
                     messages,
                     mood,
-                    language
+                    language,
+                    isChipClick
                 );
             }
 
@@ -900,7 +901,7 @@ export default function Chat() {
                         {ACTION_CHIPS.map((chip) => (
                             <button
                                 key={chip}
-                                onClick={() => handleSend(chip)}
+                                onClick={() => handleSend(chip, true)}
                                 className="px-4 py-2 rounded-full text-sm font-medium bg-white/80 border border-[#6BCB9A]/40 text-[#355F4B] hover:bg-[#CFF3E4] hover:border-[#6BCB9A] transition-all shadow-sm"
                             >
                                 {chip}
@@ -910,12 +911,12 @@ export default function Chat() {
                 )}
                 {showCounselorCard && (
                     <div className="ml-11 mr-2">
-                        <div className="bg-white/90 backdrop-blur-sm border border-red-100 rounded-2xl p-4 shadow-lg">
+                        <div className="bg-white/90 backdrop-blur-sm border border-[#CFF3E4] rounded-2xl p-4 shadow-lg">
                             {/* 헤더 */}
                             <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-lg">🆘</span>
-                                    <p className="text-sm font-bold text-red-600">{t.counselorCardTitle}</p>
+                                    <span className="text-lg">💚</span>
+                                    <p className="text-sm font-bold text-[#1a3d2b]">{t.counselorCardTitle}</p>
                                 </div>
                                 <button
                                     onClick={() => setShowCounselorCard(false)}
@@ -929,9 +930,9 @@ export default function Chat() {
                                 {t.counselors.map((c) => (
                                     <div
                                         key={c.phone}
-                                        className="flex flex-col items-center bg-red-50 border border-red-100 rounded-2xl px-3 py-3 gap-2"
+                                        className="flex flex-col items-center bg-[#CFF3E4]/40 border border-[#6BCB9A]/30 rounded-2xl px-3 py-3 gap-2"
                                     >
-                                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-lg flex-shrink-0">
+                                        <div className="w-10 h-10 rounded-full bg-[#CFF3E4] flex items-center justify-center text-lg flex-shrink-0">
                                             📞
                                         </div>
                                         <div className="text-center flex-1">
@@ -940,7 +941,7 @@ export default function Chat() {
                                         </div>
                                         <a
                                             href={`tel:${c.phone}`}
-                                            className="w-full flex items-center justify-center gap-1 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all active:scale-95 shadow-sm"
+                                            className="w-full flex items-center justify-center gap-1 py-2 bg-[#6BCB9A] hover:bg-[#5ab88a] text-white text-xs font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                                         >
                                             {t.counselorCallBtn} {c.phone}
                                         </a>

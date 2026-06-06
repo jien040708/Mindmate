@@ -163,7 +163,7 @@ app.post("/make-server-c31a62f1/chat", async (c) => {
     }
 
     const body = await c.req.json();
-    const { message, persona, conversationHistory, mood, language } = body;
+    const { message, persona, conversationHistory, mood, language, isChipMessage } = body;
 
     if (!message || !persona) {
       return c.json({ error: "Missing required fields: message and persona" }, 400);
@@ -191,10 +191,21 @@ Do NOT mix languages. Reply only in ${targetLang}.`;
 
     const counselingBlock = buildPersonaSystemPrompt(persona);
 
+    // ── 칩 메시지 전용 지시 ────────────────────────────────────────────────────
+    const chipInstruction = isChipMessage ? `
+
+[CHIP RESPONSE — SPECIAL INSTRUCTION]
+The user just selected a self-care activity: "${message}"
+Respond in this exact structure (in ${targetLang}):
+1. Warmly endorse the activity in 1–2 sentences that feel natural for your counseling style.
+2. Encourage them to go do it right now.
+3. End with ONE question asking them to come back and share how it went (e.g. what they experienced, how they felt, what happened).
+Keep it warm, brief, and conversational. Do NOT ask multiple questions.` : "";
+
     const systemInstruction = `${languageBlock}
 
 ${counselingBlock}
-${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}`;
+${moodContext ? `\n[Current Session Context]\n${moodContext}` : ""}${chipInstruction}`;
 
     // Build conversation contents
     const contents = [];
